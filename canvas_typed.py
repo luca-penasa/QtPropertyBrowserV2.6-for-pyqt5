@@ -293,7 +293,8 @@ class MainWindow(QMainWindow):
 
     def itemClicked(self, item):
         self.updateExpandState()
-        self.propertyEditor.clear()
+        for p in self.propertyToId.keys():
+            p.destroy()
         self.propertyToId.clear()
         self.idToProperty.clear()
 

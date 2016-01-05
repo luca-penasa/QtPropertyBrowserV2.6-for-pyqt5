@@ -133,7 +133,7 @@ class QtProperty():
     def __init__(self, manager=None):
         self.d__ptr = QtPropertyPrivate(manager)
         self.d__ptr.q_ptr = self
-
+        
     ###
     #    Destroys this property.
     #
@@ -144,8 +144,12 @@ class QtProperty():
     #
     ###
     def __del__(self):
+        self.destroy()
+
+    # As python can't force free memory after use del, so we have to destroy it manual
+    def destroy(self):
         for property in self.d__ptr.m_parentItems:
-            property.m_manager.d__ptr.propertyRemoved(self, property)
+            property.d__ptr.m_manager.d__ptr.propertyRemoved(self, property)
 
         if self.d__ptr.m_manager and self.d__ptr.m_manager!=-1:
             self.d__ptr.m_manager.d__ptr.propertyDestroyed(self)
@@ -155,7 +159,7 @@ class QtProperty():
 
         for property in self.d__ptr.m_parentItems:
             property.d__ptr.m_subItems.removeAll(self)
-
+            
     ###
     #    Returns the set of subproperties.
     #
@@ -624,8 +628,10 @@ class QtAbstractPropertyManager(QObject):
     #    \sa propertyDestroyed(), uninitializeProperty()
     ###
     def clear(self):
-        for prop in self.properties():
-            del prop
+        properties = list(self.properties())
+        for i in range(len(properties)):
+            prop = properties[i]
+            prop.destroy()
 
     ###
     #    Returns the set of properties created by this manager.
