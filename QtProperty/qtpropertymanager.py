@@ -41,47 +41,48 @@
 
 import copy
 from PyQt5.QtCore import (
-    QObject,  
-    QLocale, 
-    QSize, 
-    QPoint, 
-    QRect, 
-    QRectF, 
-    QRegExp, 
-    Qt, 
-    QDate, 
-    QTime, 
-    QDateTime, 
-    QSizeF, 
-    QTimer, 
-    qAddPostRoutine, 
-    QCoreApplication, 
-    pyqtSignal, 
-    QPointF, 
+    QObject,
+    QLocale,
+    QSize,
+    QPoint,
+    QRect,
+    QRectF,
+    QRegExp,
+    Qt,
+    QDate,
+    QTime,
+    QDateTime,
+    QSizeF,
+    QTimer,
+    qAddPostRoutine,
+    QCoreApplication,
+    pyqtSignal,
+    QPointF,
     pyqtProperty
 )
 
 from PyQt5.QtWidgets import (
-    QStyle, 
-    QApplication, 
-    QSizePolicy, 
-    QLineEdit, 
+    QStyle,
+    QApplication,
+    QSizePolicy,
+    QLineEdit,
     QStyleOptionButton
     )
 from PyQt5.QtGui import (
-    QIcon, 
-    QPainter, 
-    QPixmap, 
-    QKeySequence, 
-    QCursor, 
-    QFontDatabase, 
-    QFont, 
-    QColor, 
+    QIcon,
+    QPainter,
+    QPixmap,
+    QKeySequence,
+    QCursor,
+    QFontDatabase,
+    QFont,
+    QColor,
     QBrush
     )
 
 from qtpropertybrowser import QtProperty, QtAbstractPropertyManager
-from qtpropertybrowserutils import QtPropertyBrowserUtils, QtCursorDatabase, QList, QMap, QMapList, QMapMap, INT_MAX, INT_MIN
+from qtpropertybrowserutils import QtPropertyBrowserUtils, QtCursorDatabase
+from pyqtcore import QList, QMap, QMapList, QMapMap, INT_MAX, INT_MIN
 
 DATA_VAL            = 1
 DATA_MINVAL         = 2
@@ -340,7 +341,7 @@ def setBorderValue(manager, managerPrivate, propertyChangedSignal, valueChangedS
 
 def setMinimumValue(manager, managerPrivate, propertyChangedSignal, valueChangedSignal, rangeChangedSignal, property, minVal):
     setSubPropertyRange = 0
-    setBorderValue(manager, managerPrivate, 
+    setBorderValue(manager, managerPrivate,
             propertyChangedSignal, valueChangedSignal, rangeChangedSignal,
             property, DATA_GETMINVAL, DATA_SETMINVAL, minVal, setSubPropertyRange)
 
@@ -688,7 +689,7 @@ class QtIntPropertyManager(QtAbstractPropertyManager):
     #    \sa minimum(), setRange(), rangeChanged()
     ###
     def setMinimum(self, property, minVal):
-        setMinimumValue(self, self.d_ptr, 
+        setMinimumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -704,7 +705,7 @@ class QtIntPropertyManager(QtAbstractPropertyManager):
     #    \sa maximum(), setRange(), rangeChanged()
     ###
     def setMaximum(self, property, maxVal):
-        setMaximumValue(self, self.d_ptr, 
+        setMaximumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -726,7 +727,7 @@ class QtIntPropertyManager(QtAbstractPropertyManager):
     ###
     def setRange(self, property, minVal, maxVal):
         setSubPropertyRange = 0
-        setBorderValues(self, self.d_ptr, 
+        setBorderValues(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -977,7 +978,7 @@ class QtDoublePropertyManager(QtAbstractPropertyManager):
     def setValue(self, property, val):
         setSubPropertyValue = 0
         setValueInRange(self,
-                    self.d_ptr, 
+                    self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     property, val, setSubPropertyValue)
@@ -1068,7 +1069,7 @@ class QtDoublePropertyManager(QtAbstractPropertyManager):
     #    \sa minimum(), setRange(), rangeChanged()
     ###
     def setMinimum(self, property, minVal):
-        setMinimumValue(self, self.d_ptr, 
+        setMinimumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -1084,7 +1085,7 @@ class QtDoublePropertyManager(QtAbstractPropertyManager):
     #    \sa maximum(), setRange(), rangeChanged()
     ###
     def setMaximum(self, property, maxVal):
-        setMaximumValue(self, self.d_ptr, 
+        setMaximumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -1106,7 +1107,7 @@ class QtDoublePropertyManager(QtAbstractPropertyManager):
     ###
     def setRange(self, property, minVal, maxVal):
         setSubPropertyRange = 0
-        setBorderValues(self, self.d_ptr, 
+        setBorderValues(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -1299,7 +1300,7 @@ class QtStringPropertyManager(QtAbstractPropertyManager):
         if not property in self.d_ptr.m_values.keys():
             return
 
-        data = self.d_ptr.m_values[property] 
+        data = self.d_ptr.m_values[property]
 
         if (data.regExp == regExp):
             return
@@ -1676,7 +1677,7 @@ class QtDatePropertyManager(QtAbstractPropertyManager):
     def setValue(self, property, val):
         setSubPropertyValue = 0
         setValueInRange(self,
-                    self.d_ptr, 
+                    self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     property, val, setSubPropertyValue)
@@ -1691,7 +1692,7 @@ class QtDatePropertyManager(QtAbstractPropertyManager):
     #    \sa minimum(), setRange()
     ###
     def setMinimum(self, property, minVal):
-        setMinimumValue(self, self.d_ptr, 
+        setMinimumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -1707,7 +1708,7 @@ class QtDatePropertyManager(QtAbstractPropertyManager):
     #    \sa maximum(), setRange()
     ###
     def setMaximum(self, property, maxVal):
-        setMaximumValue(self, self.d_ptr, 
+        setMaximumValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -1729,7 +1730,7 @@ class QtDatePropertyManager(QtAbstractPropertyManager):
     ###
     def setRange(self, property, minVal, maxVal):
         setSubPropertyRange = 0
-        setBorderValues(self, self.d_ptr, 
+        setBorderValues(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -2266,7 +2267,7 @@ class QtLocalePropertyManager(QtAbstractPropertyManager):
         langIdx = 0
         countryIdx = 0
         langIdx, countryIdx = metaEnumProvider().localeToIndex(loc.language(), loc.country())
-        s = self.tr("%s, %s"%(metaEnumProvider().languageEnumNames()[langIdx], 
+        s = self.tr("%s, %s"%(metaEnumProvider().languageEnumNames()[langIdx],
                 metaEnumProvider().countryEnumNames(loc.language()).at(countryIdx)))
         return s
 
@@ -2467,7 +2468,7 @@ class QtPointPropertyManager(QtAbstractPropertyManager):
         if not property in self.d_ptr.m_values.keys():
             return ''
         v = self.d_ptr.m_values[property]
-        return self.tr("(%d, %d)")%(v.x(), v.y())
+        return self.tr("(%d, %d)"%(v.x(), v.y()))
 
     ###
     #    \fn void QtPointPropertyManager.setValue(property, value)
@@ -2560,7 +2561,7 @@ class QtPointFPropertyManagerPrivate():
 
     def slotPropertyDestroyed(self, property):
         pointProp = self.m_xToProperty.get(property, 0)
-        if pointProp: 
+        if pointProp:
             self.m_propertyToX[pointProp] = 0
             self.m_xToProperty.remove(property)
         else:
@@ -2829,7 +2830,7 @@ class QtSizePropertyManagerPrivate():
             self.m_wToProperty.remove(property)
         else:
             pointProp = self.m_hToProperty.get(property, 0)
-            if pointProp: 
+            if pointProp:
                 self.m_propertyToH[pointProp] = 0
                 self.m_hToProperty.remove(property)
 
@@ -2971,7 +2972,7 @@ class QtSizePropertyManager(QtAbstractPropertyManager):
         if not property in self.d_ptr.m_values.keys():
             return ''
         v = self.d_ptr.m_values[property].val
-        return self.tr("%d x %d")%(v.width(), v.height())
+        return self.tr("%d x %d"%(v.width(), v.height()))
 
     #
     ###
@@ -2987,7 +2988,7 @@ class QtSizePropertyManager(QtAbstractPropertyManager):
     ###
     def setValue(self, property, val):
         setValueInRange(self,
-                    self.d_ptr, 
+                    self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     property, val, self.d_ptr.setValue)
@@ -3003,7 +3004,7 @@ class QtSizePropertyManager(QtAbstractPropertyManager):
     #    \sa minimum(), setRange(), rangeChanged()
     ###
     def setMinimum(self, property, minVal):
-        setBorderValue(self, self.d_ptr, 
+        setBorderValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3023,7 +3024,7 @@ class QtSizePropertyManager(QtAbstractPropertyManager):
     #    \sa maximum(), setRange(), rangeChanged()
     ###
     def setMaximum(self, property, maxVal):
-        setBorderValue(self, self.d_ptr, 
+        setBorderValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3048,7 +3049,7 @@ class QtSizePropertyManager(QtAbstractPropertyManager):
     #    \sa setMinimum(), setMaximum(), rangeChanged()
     ###
     def setRange(self, property, minVal, maxVal):
-        setBorderValues(self, self.d_ptr, 
+        setBorderValues(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3313,8 +3314,8 @@ class QtSizeFPropertyManager(QtAbstractPropertyManager):
     #    \sa value(), setRange(), valueChanged()
     ###
     def setValue(self, property, val):
-        setValueInRange(self, 
-                    self.d_ptr, 
+        setValueInRange(self,
+                    self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     property, val, self.d_ptr.setValue)
@@ -3361,7 +3362,7 @@ class QtSizeFPropertyManager(QtAbstractPropertyManager):
     #    \sa minimum(), setRange(), rangeChanged()
     ###
     def setMinimum(self, property, minVal):
-        setBorderValue(self, self.d_ptr, 
+        setBorderValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3380,7 +3381,7 @@ class QtSizeFPropertyManager(QtAbstractPropertyManager):
     #    \sa maximum(), setRange(), rangeChanged()
     ###
     def setMaximum(self, property, maxVal):
-        setBorderValue(self, self.d_ptr, 
+        setBorderValue(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3404,7 +3405,7 @@ class QtSizeFPropertyManager(QtAbstractPropertyManager):
     #    \sa setMinimum(), setMaximum(), rangeChanged()
     ###
     def setRange(self, property, minVal, maxVal):
-        setBorderValues(self, self.d_ptr, 
+        setBorderValues(self, self.d_ptr,
                     self.propertyChangedSignal,
                     self.valueChangedSignal,
                     self.rangeChangedSignal,
@@ -3495,7 +3496,7 @@ class QtRectPropertyManagerPrivate():
                         r.moveLeft(data.constraint.left() + data.constraint.width() - r.width())
 
                     self.q_ptr.setValue(prop, r)
-                else: 
+                else:
                     prop = self.m_hToProperty.get(property, 0)
                     if prop:
                         data = copy.copy(self.m_values[prop])
@@ -3666,7 +3667,7 @@ class QtRectPropertyManager(QtAbstractPropertyManager):
         if not property in self.d_ptr.m_values.keys():
             return ''
         v = self.d_ptr.m_values[property].val
-        return self.tr("[(%d, %d), %d x %d]")%(v.x(), v.y(),v.width(),v.height())
+        return self.tr("[(%d, %d), %d x %d]"%(v.x(), v.y(),v.width(),v.height()))
 
     ###
     #    \fn void QtRectPropertyManager.setValue(property, value)
@@ -3894,17 +3895,17 @@ class QtRectFPropertyManagerPrivate():
         if pointProp:
             self.m_propertyToX[pointProp] = 0
             self.m_xToProperty.remove(property)
-        else: 
+        else:
             pointProp = self.m_yToProperty.get(property, 0)
             if pointProp:
                 self.m_propertyToY[pointProp] = 0
                 self.m_yToProperty.remove(property)
-            else: 
+            else:
                 pointProp = self.m_wToProperty.get(property, 0)
                 if pointProp:
                     self.m_propertyToW[pointProp] = 0
                     self.m_wToProperty.remove(property)
-                else: 
+                else:
                     pointProp = self.m_hToProperty.get(property, 0)
                     if pointProp:
                         self.m_propertyToH[pointProp] = 0
@@ -4968,7 +4969,7 @@ class QtSizePolicyPropertyManager(QtAbstractPropertyManager):
         vIndex = mep.sizePolicyToIndex(sp.verticalPolicy())
         #! Unknown size policy on reading invalid uic3 files
         if hIndex != -1:
-            hPolicy = mep.policyEnumValueNames()[sp.horizontalPolicy()] 
+            hPolicy = mep.policyEnumValueNames()[sp.horizontalPolicy()]
         else:
             hPolicy = self.tr("<Invalid>")
         if vIndex != -1:
@@ -4978,7 +4979,7 @@ class QtSizePolicyPropertyManager(QtAbstractPropertyManager):
         plNames = mep.policyEnumValueNames()
         hPolicy = plNames.get(sp.horizontalPolicy(), 0)
         vPolicy = plNames.get(sp.verticalPolicy(), 0)
-        s = self.tr("[%s, %s, %d, %d]")%(hPolicy, vPolicy,sp.horizontalStretch(),sp.verticalStretch())
+        s = self.tr("[%s, %s, %d, %d]"%(hPolicy, vPolicy,sp.horizontalStretch(),sp.verticalStretch()))
         return s
 
     ###
@@ -5145,25 +5146,25 @@ class QtFontPropertyManagerPrivate():
             f = QFont(self.m_values[prop])
             f.setBold(value)
             self.q_ptr.setValue(prop, f)
-        else: 
+        else:
             prop = self.m_italicToProperty.get(property, 0)
             if prop:
                 f = QFont(self.m_values[prop])
                 f.setItalic(value)
                 self.q_ptr.setValue(prop, f)
-            else: 
+            else:
                 prop = self.m_underlineToProperty.get(property, 0)
                 if prop:
                     f = QFont(self.m_values[prop])
                     f.setUnderline(value)
                     self.q_ptr.setValue(prop, f)
-                else: 
+                else:
                     prop = self.m_strikeOutToProperty.get(property, 0)
                     if prop:
                         f = QFont(self.m_values[prop])
                         f.setStrikeOut(value)
                         self.q_ptr.setValue(prop, f)
-                    else: 
+                    else:
                         prop = self.m_kerningToProperty.get(property, 0)
                         if prop:
                             f = QFont(self.m_values[prop])
@@ -5180,27 +5181,27 @@ class QtFontPropertyManagerPrivate():
             if pointProp:
                 self.m_propertyToFamily[pointProp] = 0
                 self.m_familyToProperty.remove(property)
-            else: 
+            else:
                 pointProp = self.m_boldToProperty.get(property, 0)
                 if pointProp:
                     self.m_propertyToBold[pointProp] = 0
                     self.m_boldToProperty.remove(property)
-                else: 
+                else:
                     pointProp = self.m_italicToProperty.get(property, 0)
                     if pointProp:
                         self.m_propertyToItalic[pointProp] = 0
                         self.m_italicToProperty.remove(property)
-                    else: 
+                    else:
                         pointProp = self.m_underlineToProperty.get(property, 0)
                         if pointProp:
                             self.m_propertyToUnderline[pointProp] = 0
                             self.m_underlineToProperty.remove(property)
-                        else: 
+                        else:
                             pointProp = self.m_strikeOutToProperty.get(property, 0)
                             if pointProp:
                                 self.m_propertyToStrikeOut[pointProp] = 0
                                 self.m_strikeOutToProperty.remove(property)
-                            else: 
+                            else:
                                 pointProp = self.m_kerningToProperty.get(property, 0)
                                 if pointProp:
                                     self.m_propertyToKerning[pointProp] = 0
@@ -5537,7 +5538,7 @@ class QtColorPropertyManagerPrivate():
             c = copy.copy(self.m_values[prop])
             c.setRed(value)
             self.q_ptr.setValue(prop, c)
-        else: 
+        else:
             prop = self.m_gToProperty.get(property, 0)
             if prop:
                 c = copy.copy(self.m_values[prop])
@@ -5561,7 +5562,7 @@ class QtColorPropertyManagerPrivate():
         if pointProp:
             self.m_propertyToR[pointProp] = 0
             self.m_rToProperty.remove(property)
-        else: 
+        else:
             pointProp = self.m_gToProperty.get(property, 0)
             if pointProp:
                 self.m_propertyToG[pointProp] = 0
@@ -5571,7 +5572,7 @@ class QtColorPropertyManagerPrivate():
                 if pointProp:
                     self.m_propertyToB[pointProp] = 0
                     self.m_bToProperty.remove(property)
-                else: 
+                else:
                     pointProp = self.m_aToProperty.get(property, 0)
                     if pointProp:
                         self.m_propertyToA[pointProp] = 0

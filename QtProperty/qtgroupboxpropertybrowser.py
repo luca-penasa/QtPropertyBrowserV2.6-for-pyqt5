@@ -41,11 +41,11 @@
 from qtpropertybrowser import QtAbstractPropertyBrowser
 from PyQt5.QtCore import Qt, QTimer, QRect
 from PyQt5.QtWidgets import (
-    QGridLayout, QLabel, QGroupBox, QSizePolicy, QSpacerItem, 
+    QGridLayout, QLabel, QGroupBox, QSizePolicy, QSpacerItem,
     QFrame
     )
-from qtpropertybrowserutils import (
-    QList, 
+from pyqtcore import (
+    QList,
     QMap
     )
 class WidgetItem():
@@ -56,7 +56,7 @@ class WidgetItem():
         self.groupBox = 0
         self.layout = 0
         self.line = 0
-        self.parent = 0
+        self.parent = None
         self.children = QList()
 
 class QtGroupBoxPropertyBrowserPrivate():

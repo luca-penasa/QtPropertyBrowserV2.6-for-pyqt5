@@ -39,7 +39,8 @@
 ##
 ############################################################################/
 import sys
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from PyQt5.QtWidgets import (
     QApplication, 
     QLabel, 
@@ -48,11 +49,9 @@ from PyQt5.QtWidgets import (
     QWidget,
     QFrame
     )
-from PyQt5.QtCore import (
-    Qt
-    )
-    
-from qtpropertybrowserutils import QMap, QList
+from PyQt5.QtCore import Qt
+
+from pyqtcore import QMap, QList
 from qtpropertymanager import (
     QtBoolPropertyManager, 
     QtIntPropertyManager, 
@@ -71,7 +70,7 @@ from qteditorfactory import (
     QtLineEditFactory, 
     QtEnumEditorFactory
     )
-    
+
 from qttreepropertybrowser import QtTreePropertyBrowser
 from qtgroupboxpropertybrowser import QtGroupBoxPropertyBrowser
 from qtbuttonpropertybrowser import QtButtonPropertyBrowser

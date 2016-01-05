@@ -40,7 +40,8 @@
 #############################################################################
 import sys
 
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QDockWidget
 from PyQt5.QtCore import (
     QPoint, 
@@ -51,7 +52,7 @@ from PyQt5.QtCore import (
     )
 from random import random
 from PyQt5.QtGui import QColor, QPen, QBrush
-from qtpropertybrowserutils import QMap
+from pyqtcore import QMap
 from qttreepropertybrowser import QtTreePropertyBrowser
 from qtvariantproperty import (
     QtVariantPropertyManager, 
@@ -67,10 +68,10 @@ from qtcanvas import (
     QtCanvasItem, 
     RttiValues
     )
-    
+
 def rand():
     return int(random()*0x7fff)
-    
+
 class CanvasView(QtCanvasView):
     itemClickedSignal = pyqtSignal(QtCanvasItem)
     itemMovedSignal = pyqtSignal(QtCanvasItem)
@@ -81,7 +82,7 @@ class CanvasView(QtCanvasView):
             super(CanvasView, self).__init__(arg1)
         self.moving = QtCanvasItem(None)
         self.moving_start = QPoint()
-        
+
     def contentsMousePressEvent(self, event):
         self.handleMouseClickEvent(event)
 
@@ -351,7 +352,7 @@ class MainWindow(QMainWindow):
 
         if (not self.currentItem or self.currentItem.isNone()):
             return
-            
+
         id = self.propertyToId[property]
         if (id == "xpos"):
             self.currentItem.setX(value)

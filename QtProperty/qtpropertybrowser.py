@@ -42,9 +42,9 @@
 import copy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QLineEdit, QWidget
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 
-from qtpropertybrowserutils import QList, QMap, QMapList, QMapMapList
+from pyqtcore import QList, QMap, QMapList, QMapMapList
 
 g_viewToManagerToFactory = None
 def m_viewToManagerToFactory():
@@ -73,7 +73,9 @@ class QtPropertyPrivate():
         self.m_statusTip = ''
         self.m_whatsThis = ''
         self.m_name = ''
-
+        self.m_nameColor = QColor()
+        self.m_valueColor = QColor()
+        
 ###
 #    \class QtProperty
 #
@@ -314,6 +316,34 @@ class QtProperty():
         self.propertyChanged()
 
     ###
+    #    \fn void QtProperty::setNameColor(const QColor &color)
+    #
+    #    Sets the property's name color to the given \a color.
+    #
+    #    \sa nameColor()
+    ###
+    def setNameColor(self, color):
+        if (self.d__ptr.m_nameColor == color):
+            return
+
+        self.d__ptr.m_nameColor = color
+        self.propertyChanged()
+
+    ###
+    #    \fn void QtProperty::setValueColor(const QColor &color)
+    #
+    #    Sets the property's value color to the given \a color.
+    #
+    #    \sa valueColor()
+    ###
+    def setValueColor(self, color):
+        if (self.d__ptr.m_valueColor == color):
+            return
+
+        self.d__ptr.m_valueColor = color
+        self.propertyChanged()
+
+    ###
     #    Enables or disables the property according to the passed \a enable value.
     #
     #    \sa isEnabled()
@@ -346,7 +376,7 @@ class QtProperty():
     #    \sa insertSubProperty(), removeSubProperty()
     ###
     def addSubProperty(self, property):
-        after = QtProperty()
+        after = None
         if (len(self.d__ptr.m_subItems) > 0):
             after = self.d__ptr.m_subItems[-1]
         self.insertSubProperty(property, after)
@@ -387,7 +417,7 @@ class QtProperty():
         pendingList = self.subProperties()
         pos = 0
         newPos = 0
-        properAfterProperty = QtProperty(-1)
+        properAfterProperty = None
         while (pos < len(pendingList)):
             i = pendingList[pos]
             if (i == property):
@@ -454,7 +484,7 @@ class QtAbstractPropertyManagerPrivate():
         self.q_ptr.propertyRemovedSignal.emit(property, parentProperty)
 
     def propertyInserted(self, property, parentProperty, afterProperty=None):
-        self.q_ptr.propertyInsertedSignal.emit(property, parentProperty, afterProperty)
+        self.q_ptr.propertyInsertedSignal.emit(property, parentProperty, [afterProperty])
 
 ###
 #    \class QtAbstractPropertyManager
@@ -569,7 +599,7 @@ class QtAbstractPropertyManagerPrivate():
 #    \sa QtAbstractPropertyBrowser::setCurrentItem()
 ###
 class QtAbstractPropertyManager(QObject):
-    propertyInsertedSignal = pyqtSignal(QtProperty, QtProperty, QtProperty)
+    propertyInsertedSignal = pyqtSignal(QtProperty, QtProperty, list)
     propertyChangedSignal = pyqtSignal(QtProperty)
     propertyRemovedSignal = pyqtSignal(QtProperty, QtProperty)
     propertyDestroyedSignal = pyqtSignal(QtProperty)
@@ -585,14 +615,14 @@ class QtAbstractPropertyManager(QObject):
     ###
     #    Destroys the manager. All properties created by the manager are
     #    destroyed.
-    ###      
+    ###
     def __del__(self):
         self.clear()
 
     #    Destroys all the properties that this manager has created.
     #
     #    \sa propertyDestroyed(), uninitializeProperty()
-    ### 
+    ###
     def clear(self):
         for prop in self.properties():
             del prop
@@ -613,7 +643,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa QtProperty::hasValue()
     ###
     def hasValue(self, property):
-        #Q_UNUSED(property)
         return True
 
     ###
@@ -626,7 +655,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa QtProperty::valueIcon()
     ###
     def valueIcon(self, property):
-        #Q_UNUSED(property)
         return QIcon()
 
     ###
@@ -639,7 +667,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa QtProperty::valueText()
     ###
     def valueText(self, property):
-        #Q_UNUSED(property)
         return ''
 
     ###
@@ -652,7 +679,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa QtProperty::valueText()
     ###
     def displayText(self, property):
-        #Q_UNUSED(property)
         return ''
 
     ###
@@ -664,7 +690,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa QtProperty::valueText()
     ###
     def echoMode(self, property):
-        #Q_UNUSED(property)
         return QLineEdit.Normal
 
     ###
@@ -705,9 +730,9 @@ class QtAbstractPropertyManager(QObject):
     #    The purpose is to let the manager know that the \a property has
     #    been created so that it can provide additional attributes for the
     #    new property, e.g. QtIntPropertyManager adds \l
-    #QtIntPropertyManager::value()value, \l
-    #QtIntPropertyManager::minimum()minimumand \l
-    #QtIntPropertyManager::maximum()maximumattributes. Since each manager
+    #    QtIntPropertyManager::value()value, \l
+    #    QtIntPropertyManager::minimum()minimumand \l
+    #    QtIntPropertyManager::maximum()maximumattributes. Since each manager
     #    subclass adds type specific attributes, this function is pure
     #    virtual and must be reimplemented when deriving from the
     #    QtAbstractPropertyManager class.
@@ -725,7 +750,6 @@ class QtAbstractPropertyManager(QObject):
     #    \sa clear(), propertyDestroyed()
     ###
     def uninitializeProperty(self, property):
-        #Q_UNUSED(property)
         pass
 
 ###
@@ -784,7 +808,7 @@ class QtAbstractPropertyManager(QObject):
 ###
 
 ###
-#    \fn QtAbstractEditorFactoryBase::QtAbstractEditorFactoryBase(parent = 0)
+#    \fn QtAbstractEditorFactoryBase::QtAbstractEditorFactoryBase(parent = None)
 #
 #    Creates an abstract editor factory with the given \a parent.
 ###
@@ -879,7 +903,7 @@ class QtAbstractPropertyManager(QObject):
 ###
 
 ###
-#    \fn QtAbstractEditorFactory::QtAbstractEditorFactory(parent = 0)
+#    \fn QtAbstractEditorFactory::QtAbstractEditorFactory(parent = None)
 #
 #    Creates an editor factory with the given \a parent.
 #
@@ -1156,7 +1180,6 @@ class QtAbstractPropertyBrowserPrivate():
                 parentIdx = idx.parent()
                 if ((parentProperty and parentIdx and parentIdx.property() == parentProperty) or (not parentProperty and not parentIdx)):
                     parentToAfter[idx.parent()] = idx
-
         elif (parentProperty):
             if not parentProperty in self.m_propertyToIndexes.keys():
                 return
@@ -1231,6 +1254,8 @@ class QtAbstractPropertyBrowserPrivate():
     def slotPropertyInserted(self, property, parentProperty, afterProperty):
         if (not self.m_propertyToParents.get(parentProperty)):
             return
+        if type(afterProperty)==list:
+            afterProperty = afterProperty[0]
         self.createBrowserIndexes(property, parentProperty, afterProperty)
         self.insertSubTree(property, parentProperty)
         #self.propertyInserted(property, parentProperty, afterProperty)
@@ -1517,20 +1542,20 @@ class QtAbstractPropertyBrowser(QWidget):
 
     def createBrowserIndexes(self, property, parentProperty, afterProperty):
         parentToAfter = QMap()
-        if (afterProperty):
-            if not afterProperty in self.d__ptr.m_propertyToIndexes.keys():
+        if afterProperty:
+            indexes = self.d__ptr.m_propertyToIndexes.get(afterProperty)
+            if not indexes:
                 return
 
-            indexes = self.d__ptr.m_propertyToIndexes[afterProperty]
             for idx in indexes:
                 parentIdx = idx.parent()
                 if ((parentProperty and parentIdx and parentIdx.property() == parentProperty) or (not parentProperty and not parentIdx)):
                     parentToAfter[idx.parent()] = idx
-
-        elif (parentProperty):
-            if not parentProperty in self.d__ptr.m_propertyToIndexes.keys():
+        elif parentProperty:
+            indexes = self.d__ptr.m_propertyToIndexes.get(parentProperty)
+            if not indexes:
                 return
-
+                
             for idx in indexes:
                 parentToAfter[idx] = 0
         else:
@@ -1600,6 +1625,8 @@ class QtAbstractPropertyBrowser(QWidget):
     def slotPropertyInserted(self, property, parentProperty, afterProperty):
         if (not self.d__ptr.m_propertyToParents.get(parentProperty)):
             return
+        if type(afterProperty)==list:
+            afterProperty = afterProperty[0]
         self.createBrowserIndexes(property, parentProperty, afterProperty)
         self.insertSubTree(property, parentProperty)
         #self.propertyInserted(property, parentProperty, afterProperty)

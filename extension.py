@@ -39,10 +39,11 @@
 ##
 ############################################################################/
 import sys
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QVariant, QPointF
-from qtpropertybrowserutils import QMap
+from pyqtcore import QMap
 from qtvariantproperty import QtVariantPropertyManager, QtVariantEditorFactory
 from qttreepropertybrowser import QtTreePropertyBrowser
 
@@ -51,13 +52,13 @@ class VariantManager(QtVariantPropertyManager):
         value = QVariant()
         x = 0
         y = 0
-    
+
     def __init__(self, parent=None):
         super(VariantManager, self).__init__(parent)
         self.propertyToData = QMap()
         self.xToProperty = QMap()
         self.yToProperty = QMap()
-        
+
         self.valueChangedSignal.connect(self.slotValueChanged)
         self.propertyDestroyedSignal.connect(self.slotPropertyDestroyed)
 
@@ -87,7 +88,7 @@ class VariantManager(QtVariantPropertyManager):
             pointProperty = self.yToProperty[property]
             self.propertyToData[pointProperty].y = 0
             self.yToProperty.remove(property)
-    
+
     def isPropertyTypeSupported(self, propertyType):
         if (propertyType == QVariant.PointF):
             return True
@@ -107,8 +108,8 @@ class VariantManager(QtVariantPropertyManager):
         if (self.propertyToData.contains(property)):
             v = self.propertyToData[property].value
             p = v.value()
-            return self.tr("(%.2f, %.2f)")%(p.x(), p.y())
-    
+            return self.tr("(%.2f, %.2f)"%(p.x(), p.y()))
+
         return super(VariantManager, self).valueText(property)
 
     def setValue(self, property, val):
@@ -128,7 +129,7 @@ class VariantManager(QtVariantPropertyManager):
             self.propertyChangedSignal.emit(property)
             self.valueChangedSignal.emit(property, p)
             return
-    
+
         super(VariantManager, self).setValue(property, val)
 
     def initializeProperty(self, property):
@@ -148,7 +149,7 @@ class VariantManager(QtVariantPropertyManager):
             self.yToProperty[d.y] = property
 
             self.propertyToData[property] = d
-        
+
         super(VariantManager, self).initializeProperty(property)
 
     def uninitializeProperty(self, property):
@@ -159,7 +160,7 @@ class VariantManager(QtVariantPropertyManager):
             if (d.y):
                 self.yToProperty.remove(d.y)
             self.propertyToData.remove(property)
-        
+
         super(VariantManager, self).uninitializeProperty(property)
 
 if __name__ == '__main__':
@@ -177,12 +178,10 @@ if __name__ == '__main__':
     ed1.setFactoryForManager(varMan, variantFactory)
     ed1.addProperty(item)
 
-
     ed1.show()
 
     ret = app.exec()
 
     del variantFactory
     del variantManager
-
 

@@ -40,7 +40,7 @@
 #############################################################################
 
 from qteditorfactory import (
-    QtAbstractEditorFactory, 
+    QtAbstractEditorFactory,
     QtSpinBoxFactory,
     QtCheckBoxFactory,
     QtDoubleSpinBoxFactory,
@@ -57,7 +57,7 @@ from qteditorfactory import (
     )
 from qtpropertybrowser import QtProperty
 from qtpropertymanager import (
-    QtAbstractPropertyManager, 
+    QtAbstractPropertyManager,
     QtIntPropertyManager,
     QtBoolPropertyManager,
     QtDoublePropertyManager,
@@ -79,13 +79,10 @@ from qtpropertymanager import (
     QtSizePolicyPropertyManager,
     QtFontPropertyManager,
     QtColorPropertyManager,
-    QtCursorPropertyManager, 
+    QtCursorPropertyManager,
     QtGroupPropertyManager
     )
-from qtpropertybrowserutils import (
-    QMap, 
-    QMapMap
-    )
+from pyqtcore import QMap, QMapMap
 from PyQt5.QtCore import QVariant, pyqtSignal, QUrl
 from PyQt5.QtGui import QIcon, QKeySequence
 
@@ -189,7 +186,7 @@ class QtVariantProperty(QtProperty):
     #   Destroys this property.
 
     #   \sa QtProperty::~QtProperty()
-    ###   
+    ###
     def __del__(self):
         del self.d_ptr
 
@@ -332,7 +329,8 @@ class QtVariantPropertyManagerPrivate():
     def slotPropertyInserted(self, property, parent, after):
         if (self.m_creatingProperty):
             return
-
+        if type(after)==list:
+            after = after[0]
         varParent = self.m_internalToProperty.get(parent, 0)
         if (not varParent):
             return
@@ -346,7 +344,6 @@ class QtVariantPropertyManagerPrivate():
         self.createSubProperty(varParent, varAfter, property)
 
     def slotPropertyRemoved(self, property, parent):
-        #Q_UNUSED(parent)
         varProperty = self.m_internalToProperty.get(property, 0)
         if (not varProperty):
             return
@@ -996,7 +993,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
         manager = internProp.propertyManager()
         tm = type(manager)
         if tm == QtKeySequencePropertyManager:
-            return QVariant.fromValue(manager.value(internProp))
+            return QVariant(manager.value(internProp))
         else:
             return manager.value(internProp)
 

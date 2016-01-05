@@ -41,200 +41,25 @@
 
 from PyQt5.QtCore import Qt, QCoreApplication, QRectF, QEvent, pyqtSignal
 from PyQt5.QtWidgets import (
-    QLineEdit, 
-    QWidget, 
-    QApplication, 
-    QHBoxLayout, 
-    QCheckBox, 
-    QStyleOption, 
-    QAction, 
+    QLineEdit,
+    QWidget,
+    QApplication,
+    QHBoxLayout,
+    QCheckBox,
+    QStyleOption,
+    QAction,
     QStyle)
 from PyQt5.QtGui import QIcon, QPainter, QCursor, QImage, QPixmap, QTextOption, QKeySequence, QFont
+from pyqtcore import QList, QMap
 import qtpropertybrowser_rc
 
-INT_MAX = 0b1111111111111111111111111111111
-INT_MIN = -0b1111111111111111111111111111111
-
-class QSet(set):
-    def insert(self, item):
-        self.add(item)
-    
-    def toList(self):
-        return QList(self)
-    
-    def contains(self, item):
-        return item in self
-        
-class QList(list):
-    def __init__(self, *args):
-        super(QList, self).__init__(*args)
-        
-    def removeAll(self, item):
-        for i in range(self.__len__()-1, -1, -1):
-            if self.__getitem__(i) == item:
-                self.__delitem__(i)
-    
-    def removeAt(self, index):
-        if index < 0 or index >= self.__len__():
-            return
-        self.__delitem__(index)
-        
-    def indexOf(self, item):
-        for i in range(self.__len__()): 
-            if self.__getitem__(i) == item:
-                return i
-        return -1
-    
-    def first(self):
-        if self.__len__()>0:
-            return self.__getitem__(0)
-        else:
-            return None
-            
-    def removeFirst(self):
-        if self.__len__()>0:
-            self.__delitem__(0)
-    
-    def count(self):
-        return self.__len__()
-        
-    def size(self):
-        return self.__len__()
-        
-    def at(self, i):
-        if i < 0 or i >= self.__len__():
-            return None
-        return self.__getitem__(i)
-    
-    def prepend(self, item):
-        self.insert(0, item)
-        
-    def isEmpty(self):
-        return self.__len__()==0
-        
-class QMap(QList):
-    def __init__(self, key=None, value=None):
-        super(QMap, self).__init__()
-        
-        if key or value:
-            self.__setitem__(key, value)
-            
-    def __getitem__(self, key):
-        for x in self.__iter__():
-            if x[0]==key:
-                return x[1]
-        return None
-    
-    def __setitem__(self, key, value):
-        for i in range(self.__len__()):
-            x = super(QMap, self).__getitem__(i)
-            if x[0]==key:
-                super(QMap, self).__setitem__(i, [key, value])
-                return
-        self.append([key, value])
-        return self.__len__()
-    
-    def keys(self):
-        r = []
-        for x in self.__iter__():
-            r.append(x[0])
-        return r
-    
-    def values(self):
-        r = []
-        for x in self.__iter__():
-            r.append(x[1])
-        return r
-    
-    def value(self, key):
-        return self.get(key)
-        
-    def get(self, key, defvalue=None):
-        v = self.__getitem__(key)
-        if v==None:
-            return defvalue
-        return v
-        
-    def remove(self, key):
-        for x in self.__iter__():
-            if x[0]==key:
-                index = self.index(x)
-                self.__delitem__(index)
-                return
-        
-    def erase(self, iter):
-        self.remove(iter)
-        
-    def count(self):
-        return self.__len__()
-    
-    def end(self):
-        return None
-    
-    def contains(self, key):
-        return self.get(key)!=None
-    
-    def popContext(self):
-        pass
-        
-class QMapList(QMap):
-    def __init__(self, key=None, value=None):
-        super(QMapList, self).__init__(key, value)
-
-    def __getitem__(self, key):
-        v = super(QMapList, self).__getitem__(key)
-        if not v:
-            v = QList()
-            super(QMapList, self).__setitem__(key, v)
-        return v
-        
-    def get(self, key, defvalue=None):
-        v = super(QMapList, self).__getitem__(key)
-        if not v:
-            return defvalue
-        return v
-        
-class QMapMap(QMap):
-    def __init__(self, key=None, value=None):
-        super(QMapMap, self).__init__(key, value)
-
-    def __getitem__(self, key):
-        v = super(QMapMap, self).__getitem__(key)
-        if not v:
-            v = QMap()
-            super(QMapMap, self).__setitem__(key, v)
-        return v
-        
-    def get(self, key, defvalue=None):
-        v = super(QMapMap, self).__getitem__(key)
-        if not v:
-            return defvalue
-        return v
-
-class QMapMapList(QMap):
-    def __init__(self, key=None, value=None):
-        super(QMapMapList, self).__init__(key, value)
-
-    def __getitem__(self, key):
-        v = super(QMapMapList, self).__getitem__(key)
-        if not v:
-            v = QMapList()
-            super(QMapMapList, self).__setitem__(key, v)
-        return v
-        
-    def get(self, key, defvalue=None):
-        v = super(QMapMapList, self).__getitem__(key)
-        if not v:
-            return defvalue
-        return v
-        
 class QtCursorDatabase():
     def __init__(self):
         self.m_cursorNames = QList()
         self.m_cursorIcons = QMap()
         self.m_valueToCursorShape = QMap()
         self.m_cursorShapeToValue = QMap()
-        
+
         self.appendCursor(Qt.ArrowCursor, QCoreApplication.translate("QtCursorDatabase", "Arrow"),
                      QIcon(":/qt-project.org/qtpropertybrowser/images/cursor-arrow.png"))
         self.appendCursor(Qt.UpArrowCursor, QCoreApplication.translate("QtCursorDatabase", "Up Arrow"),
@@ -273,8 +98,7 @@ class QtCursorDatabase():
                      QIcon(":/qt-project.org/qtpropertybrowser/images/cursor-whatsthis.png"))
         self.appendCursor(Qt.BusyCursor, QCoreApplication.translate("QtCursorDatabase", "Busy"),
                      QIcon(":/qt-project.org/qtpropertybrowser/images/cursor-busy.png"))
-        
-        
+
     def clear(self):
         self.m_cursorNames.clear()
         self.m_cursorIcons.clear()
@@ -318,7 +142,7 @@ class QtCursorDatabase():
 class QtPropertyBrowserUtils():
     def __init__(self):
         pass
-    
+
     def brushValuePixmap(b):
         img = QImage(16, 16, QImage.Format_ARGB32_Premultiplied)
         img.fill(0)
@@ -333,7 +157,7 @@ class QtPropertyBrowserUtils():
             opaqueBrush.setColor(color)
             painter.fillRect(img.width() / 4, img.height() / 4,
                              img.width() / 2, img.height() / 2, opaqueBrush)
-        
+
         painter.end()
         return QPixmap.fromImage(img)
 
@@ -383,7 +207,7 @@ class QtBoolEdit(QWidget):
 
     def textVisible(self):
         return self.m_textVisible
-    
+
     def setTextVisible(self,textVisible):
         if (self.m_textVisible == textVisible):
             return
@@ -424,7 +248,7 @@ class QtBoolEdit(QWidget):
             event.accept()
         else:
             super(QtBoolEdit, self).mousePressEvent(event)
-    
+
     def paintEvent(self, pt_QPaintEvent):
         opt = QStyleOption()
         opt.initFrom(self)
@@ -435,7 +259,7 @@ class QtKeySequenceEdit(QWidget):
     keySequenceChangedSignal = pyqtSignal(QKeySequence)
     def __init__(self,parent=None):
         super(QtKeySequenceEdit, self).__init__(parent)
-        
+
         self.m_keySequence = QKeySequence()
         self.m_num = 0
         self.m_lineEdit = QLineEdit(self)
@@ -460,7 +284,7 @@ class QtKeySequenceEdit(QWidget):
                 if (pos > 0):
                     actionString = actionString[:pos]
                 action.setText(actionString)
-            
+
             actionBefore = None
             if (len(actions) > 0):
                 actionBefore = actions[0]
@@ -472,7 +296,7 @@ class QtKeySequenceEdit(QWidget):
             menu.exec(c.globalPos())
             e.accept()
             return True
-        
+
         return super(QtKeySequenceEdit, self).eventFilter(o, e)
 
     def slotClearShortcut(self):
@@ -503,7 +327,7 @@ class QtKeySequenceEdit(QWidget):
             k0 = self.m_keySequence[0]
             k1 = self.m_keySequence[1]
             k2 = self.m_keySequence[2]
-        elif l==4:            
+        elif l==4:
             k0 = self.m_keySequence[0]
             k1 = self.m_keySequence[1]
             k2 = self.m_keySequence[2]
@@ -524,7 +348,7 @@ class QtKeySequenceEdit(QWidget):
             k3 = nextKey
         else:
             pass
-        
+
         self.m_num += 1
         if (self.m_num > 3):
             self.m_num = 0
@@ -584,6 +408,6 @@ class QtKeySequenceEdit(QWidget):
                 e.type() == QEvent.KeyRelease):
             e.accept()
             return True
-        
+
         return super(QtKeySequenceEdit, self).event(e)
 

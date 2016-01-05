@@ -39,7 +39,8 @@
 ##
 #############################################################################
 import sys
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from array import array
 from PyQt5.QtGui import QTransform as QMatrix
 from PyQt5.QtCore import (
@@ -71,7 +72,7 @@ from PyQt5.QtWidgets import (
     QApplication, 
     QScrollArea
 )
-from qtpropertybrowserutils import QSet, QList
+from pyqtcore import QSet, QList
 from enum import Enum
 
 class QPolygonEx(QPolygon):
@@ -81,10 +82,10 @@ class QPolygonEx(QPolygon):
             self.append(QPoint())
         for i in range(_n-n):
             self.remove(self.size()-1)
-    
+
     def detach(self):
         pass
-        
+
 def qt_testCollision(s1, s2):
     s2image = s2.imageAdvanced().collision_mask
     s2area = s2.boundingRectAdvanced()
@@ -210,7 +211,7 @@ def collision_double_dispatch(s1, p1, r1, e1, t1, s2, p2, r2, e2, t2):
     else:
         return collision_double_dispatch(s2, p2, r2, e2, t2, 
                                          s1, p1, r1, e1, t1)
-        
+
 class Edge(Enum):
     Left = 1
     Right = 2
@@ -243,7 +244,7 @@ class RttiValues(Enum):
     Rtti_Ellipse = 6
     Rtti_Line = 7
     Rtti_Spline = 8
-        
+
 class QtCanvasData():
     def __init__(self):
         self.viewList = QList()
@@ -445,8 +446,6 @@ def scm(a, b):
     g = gcd(a, b)
     return a/g*b
 
-
-
 ###
 #    \class QtCanvas qtcanvas.h
 #    \brief The QtCanvas class provides a 2D area that can contain QtCanvasItem objects.
@@ -647,7 +646,7 @@ class QtCanvas(QObject):
             super(QtCanvas, self).__init__()
             self.init(arg[0]*arg[2], arg[1]*arg[3], scm(arg[2], arg[3]))
             self.setTiles(parent, arg[0], arg[1], arg[2], arg[3])
-            
+
     def init(self, w, h, chunksze=16, mxclusters=100):
         self.d = QtCanvasData()
         self.awidth = w
@@ -671,28 +670,28 @@ class QtCanvas(QObject):
 
     def tilesHorizontally(self):
         return self.htiles
-        
+
     def tilesVertically(self):
         return self.vtiles
 
     def tileWidth(self):
         return self.tilew
-        
+
     def tileHeight(self):
         return self.tileh
 
     def width(self):
         return self.awidth
-        
+
     def height(self):
         return self.aheight
-        
+
     def size(self):
         return QSize(self.awidth, self.aheight)
-        
+
     def rect(self):
         return QRect(0, 0, self.awidth, self.aheight)
-        
+
     def onCanvas(self, arg1, arg2=None):
         tp = type(arg1)
         if tp==QPoint:
@@ -702,7 +701,7 @@ class QtCanvas(QObject):
             x = arg1
             y = arg2
         return x>=0 and y>=0 and x<self.awidth and y<self.aheight
-        
+
     def validChunk(self, arg1, arg2=None):
         tp = type(arg1)
         if tp==QPoint:
@@ -712,14 +711,13 @@ class QtCanvas(QObject):
             x = arg1
             y = arg2
         return x>=0 and y>=0 and x<self.chwidth and y<self.chheight
-        
 
     def chunkSize(self):
         return self.chunksize
 
     def sameChunk(self, x1, y1, x2, y2):
         return self.x1/self.chunksize==x2/self.chunksize and y1/self.chunksize==y2/self.chunksize
-        
+
     ###
     #    Destroys the canvas and all the canvas's canvas items.
     ###
@@ -789,7 +787,7 @@ class QtCanvas(QObject):
                                     item.collidesWith(g)
                                     result.append(g)
             return result
-            
+
     ###
     #\internal
     #Returns the chunk at a chunk position \a i, \a j.
@@ -810,7 +808,6 @@ class QtCanvas(QObject):
     def allItems(self):
         return self.d.itemDict.toList()
 
-
     ###
     #    Changes the size of the canvas to have a width of \a w and a
     #    height of \a h. This is a slow operation.
@@ -827,7 +824,7 @@ class QtCanvas(QObject):
 
         nchwidth = (w+self.chunksize-1)/self.chunksize
         nchheight = (h+self.chunksize-1)/self.chunksize
-        
+
         newchunks = QList()
         for i in range(nchwidth*nchheight):
             newchunks.append(QtCanvasChunk())
@@ -840,7 +837,7 @@ class QtCanvas(QObject):
         self.chheight = nchheight
         del self.chunks
         self.chunks = newchunks
-        
+
         for i in range(hidden.size()):
             hidden.at(i).show()
 
@@ -902,7 +899,7 @@ class QtCanvas(QObject):
 
             nchwidth = (self.awidth+self.chunksize-1)/self.chunksize
             nchheight = (self.aheight+self.chunksize-1)/self.chunksize
-            
+
             newchunks = QList()
             for i in range(nchwidth*nchheight):
                 newchunks.append(QtCanvasChunk())
@@ -940,7 +937,6 @@ class QtCanvas(QObject):
     #
     #    Returns a rectangle the size of the canvas.
     ###
-
 
     ###
     #    \fn bool QtCanvas.onCanvas(x, y)
@@ -1449,7 +1445,7 @@ class QtCanvas(QObject):
             y2 = clip.bottom()/self.tileh
 
             roww = self.pm.width()/self.tilew
-            
+
             for j in range(y1, y2+1):
                 jj = j%self.tilesVertically()
                 for i in range(x1, x2+1):
@@ -1562,7 +1558,6 @@ class QtCanvas(QObject):
     #    Returns the height of each tile.
     ###
 
-
     ###
     #    Sets the tile at (\a x, \a y) to use tile number \a tilenum, which
     #    is an index into the tile pixmaps. The canvas will update
@@ -1588,7 +1583,6 @@ class QtCanvas(QObject):
                 self.setChangedChunk(x, y);          # common case
             else:
                 self.setChanged(QRect(x*self.tilew, y*self.tileh, self.tilew, self.tileh))
-
 
 # lesser-used data in canvas item, plus room for extension.
 # Be careful adding to this - check all usages.
@@ -1680,7 +1674,7 @@ class QtCanvasItem():
 
     def isNone(self):
         return self.cnv==None
-        
+
     ###
     #    Destroys the QtCanvasItem and removes it from its canvas.
     ###
@@ -1730,7 +1724,7 @@ class QtCanvasItem():
     ###
     def collisions(self, exact):
         return self.canvas().collisions(self.chunks(), self, exact)
-        
+
     ###
     #    Returns 0 (RttiValues.Rtti_Item).
     #
@@ -1760,7 +1754,7 @@ class QtCanvasItem():
     ###
     def rtti(self):
         return self.RTTI
-        
+
     RTTI = RttiValues.Rtti_Item
     def extra(self):
         if (not self.ext):
@@ -1831,13 +1825,11 @@ class QtCanvasItem():
             self.myy += dy
             self.addToChunks()
 
-
     ###
     #    Moves the canvas item to the absolute position (\a x, \a y).
     ###
     def move(self, x, y):
         self.moveBy(x-self.myx, y-self.myy)
-
 
     ###
     #  \internal
@@ -1848,7 +1840,7 @@ class QtCanvasItem():
             pa = QPolygonEx(self.chunks())
             for i in range(pa.count()):
                 self.canvas().removeItemFromChunk(self, pa[i].x(), pa[i].y())
-                
+
     ###
     #    Returns True if the canvas item is in motion; otherwise returns
     #    False.
@@ -1987,7 +1979,7 @@ class QtCanvasItem():
                         n += 1
         r.resize(n)
         return r
-        
+
     ### Shorthand for setVisible(True). ###
     def show(self):
         self.setVisible(True)
@@ -2009,7 +2001,7 @@ class QtCanvasItem():
             else:
                 self.removeFromChunks()
                 self.vis = yes
-                
+
     ###
     #    \obsolete
     #    \fn bool QtCanvasItem.visible()
@@ -2017,7 +2009,7 @@ class QtCanvasItem():
     ###
     def visible(self):
         return self.vis
-        
+
     ###
     #    \fn bool QtCanvasItem.isVisible()
     #
@@ -2034,7 +2026,7 @@ class QtCanvasItem():
     ###
     def isVisible(self):
         return self.vis
-        
+
     ###
     #    \obsolete
     #    \fn bool QtCanvasItem.selected()
@@ -2042,7 +2034,7 @@ class QtCanvasItem():
     ###
     def selected(self):
         return self.sel
-        
+
     ###
     #    \fn bool QtCanvasItem.isSelected()
     #
@@ -2050,7 +2042,7 @@ class QtCanvasItem():
     ###
     def isSelected(self):
         return self.sel
-        
+
     ###
     #    Sets the selected flag of the item to \a yes. If this changes the
     #    item's selected state the item will be redrawn when
@@ -2073,7 +2065,7 @@ class QtCanvasItem():
     ###
     def enabled(self):
         return self.ena
-        
+
     ###
     #    \fn bool QtCanvasItem.isEnabled()
     #
@@ -2081,7 +2073,7 @@ class QtCanvasItem():
     ###
     def isEnabled(self):
         return self.ena
-        
+
     ###
     #    Sets the enabled flag of the item to \a yes. If this changes the
     #    item's enabled state the item will be redrawn when
@@ -2104,7 +2096,7 @@ class QtCanvasItem():
     ###
     def active(self):
         return self.act
-        
+
     ###
     #    \fn bool QtCanvasItem.isActive()
     #
@@ -2112,7 +2104,7 @@ class QtCanvasItem():
     ###
     def isActive(self):
         return self.act
-        
+
     ###
     #    Sets the active flag of the item to \a yes. If this changes the
     #    item's active state the item will be redrawn when
@@ -2127,7 +2119,7 @@ class QtCanvasItem():
         if (self.act!= yes):
             self.act = yes
             self.changeChunks()
-            
+
     ###
     #    \fn void QtCanvasItem.update()
     #
@@ -2264,7 +2256,7 @@ class QtCanvasPixmap(QPixmap):
         self.hotx = 0
         self.hoty = 0
         self.collision_mask = None
-        
+
         if not offset:
             ###
             #    Constructs a QtCanvasPixmap from the pixmap \a pm using the offset
@@ -2285,14 +2277,14 @@ class QtCanvasPixmap(QPixmap):
 
     def offsetX(self):
         return self.hotx
-        
+
     def offsetY(self):
         return self.hoty
-    
+
     def setOffset(self, x, y):
         self.hotx = x
         self.hoty = y
-        
+
     def init(self, pixmap, hx=None, hy=None):
         t = type(pixmap)
         if t==QImage:
@@ -2487,14 +2479,13 @@ class QtCanvasPixmapArray():
     def readCollisionMasks(self, filename):
         return self.readPixmaps(filename, self.framecount, True)
 
-
     def readPixmaps(self, datafilenamepattern, fc, maskonly=False):
         if (not maskonly):
             self.reset()
             framecount = fc
             if (not framecount):
                 framecount = 1
-            img = QtCanvasPixmap*[framecount]
+            img = QtCanvasPixmap[framecount]
         if (not img):
             return False
 
@@ -2504,18 +2495,18 @@ class QtCanvasPixmapArray():
             framecount = 1
         for i in range(framecount):
             r = ''
-            r.sprintf("%04d", i)
+            r.format("%04d", i)
             if (maskonly):
                 if (not img[i].collision_mask):
                     img[i].collision_mask = QImage()
                 if arg:
-                    img[i].collision_mask.load(datafilenamepattern.arg(r))
+                    img[i].collision_mask.load(datafilenamepattern%r)
                 else:
                     img[i].collision_mask.load(datafilenamepattern)
                 ok = ok and not img[i].collision_mask.isNull() and self.img[i].collision_mask.depth() == 1
             else:
                 if arg:
-                    img[i] = QtCanvasPixmap(datafilenamepattern.arg(r))
+                    img[i] = QtCanvasPixmap(datafilenamepattern%r)
                 else:
                     img[i] = QtCanvasPixmap(datafilenamepattern)
                 ok = ok and not img[i].isNull()
@@ -2691,7 +2682,7 @@ class QtCanvasPixmapArray():
         if x is None:
             x = self.frm
         return self.images.image(x)
-        
+
     ###
     #    Returns the image the sprite \e will have after advance(1) is
     #    called. By default this is the same as image().
@@ -2750,7 +2741,6 @@ class QtCanvasPixmapArray():
     ###
     def height(self):
         return self.image().height()
-
 
     ###
     #    Draws the current frame's image at the sprite's current position
@@ -2819,7 +2809,7 @@ class QtCanvasWidget(QWidget):
     def __init__(self, view):
         super(QtCanvasWidget, self).__init__(view)
         self.m_view = view
-        
+
     def mousePressEvent(self, e):
         self.m_view.contentsMousePressEvent(e)
     def mouseMoveEvent(self, e):
@@ -2872,7 +2862,7 @@ class QtCanvasView(QScrollArea):
         self.setWidget(QtCanvasWidget(self))
         self.viewing = 0
         self.setCanvas(canvas)
-        
+
     ###
     #    Destroys the canvas view. The associated canvas is \e not deleted.
     ###
@@ -2913,16 +2903,16 @@ class QtCanvasView(QScrollArea):
 
     def contentsDragEnterEvent(self):
         pass
-        
+
     def contentsDragMoveEvent(self):
         pass
 
     def contentsDragLeaveEvent(self):
         pass
-        
+
     def contentsDropEvent(self):
         pass
-        
+
     def contentsWheelEvent(self, e):
         e.ignore()
 
@@ -3078,7 +3068,6 @@ class QtCanvasView(QScrollArea):
     #
     ###
 
-
     ###
     #  Since most polygonal items don't have a pen, the default is
     #  NoPen and a black brush.
@@ -3102,7 +3091,7 @@ def defaultPolygonBrush():
 class QtCanvasPolygonalItem(QtCanvasItem):
     def __init__(self, canvas):
         super(QtCanvasPolygonalItem, self).__init__(canvas)
-        
+
         self.br = defaultPolygonBrush()
         self.pn = defaultPolygonPen()
         self.wind = 0
@@ -3122,14 +3111,14 @@ class QtCanvasPolygonalItem(QtCanvasItem):
 
     def pen(self):
         return self.pn
-    
+
     def brush(self):
         return self.br
-    
+
     def scanPolygon(self, pa, winding, process):
         scanner = QtCanvasPolygonScanner(process)
         scanner.scan(pa, winding)
-        
+
     def chunks(self):
         pa = self.areaPoints()
 
@@ -3142,14 +3131,14 @@ class QtCanvasPolygonalItem(QtCanvasItem):
         self.scanPolygon(pa, self.wind, processor)
 
         return processor.result
-    
+
     ###
     #    Returns the bounding rectangle of the polygonal item, based on
     #    areaPoints().
     ###
     def boundingRect(self):
         return self.areaPoints().boundingRect()
-        
+
     ###
     #    Reimplemented from QtCanvasItem, this draws the polygonal item by
     #    setting the pen and brush for the item on the painter \a p and
@@ -3210,7 +3199,6 @@ class QtCanvasPolygonalItem(QtCanvasItem):
             self.br = b
             self.changeChunks()
 
-    
     ###
     #    Returns 2 (RttiValues.Rtti_PolygonalItem).
     #
@@ -3219,7 +3207,7 @@ class QtCanvasPolygonalItem(QtCanvasItem):
     def rtti(self):
         return self.RTTI
     RTTI = RttiValues.Rtti_PolygonalItem
-    
+
     ###
     #    \fn bool QtCanvasItem.collidesWith(other)
     #
@@ -3233,7 +3221,7 @@ class QtCanvasPolygonalItem(QtCanvasItem):
         if len(args) == 0:
             return s.collidesWith(0, self, 0, 0, 0)
         return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, self, 0, 0, 0)
-        
+
     ###
     #    Returns True if the polygonal item uses the winding algorithm to
     #    determine the "inside" of the polygon. Returns False if it uses
@@ -3311,7 +3299,7 @@ class QPolygonalProcessor():
         self.bitmap = QImage(self.bounds.width(), self.bounds.height(), QImage.Format_MonoLSB)
         self.pnt = 0
         self.bitmap.fill(0)
-        
+
     #ifdef QCANVAS_POLYGONS_DEBUG
     #        dbg_start()
     #endif
@@ -3404,7 +3392,6 @@ class QPolygonalProcessor():
     #endif
         self.result.resize(self.pnt)
 
-
 ###
 #    \class QtCanvasPolygon qtcanvas.h
 #    \brief The QtCanvasPolygon class provides a polygon on a QtCanvas.
@@ -3430,7 +3417,7 @@ class QtCanvasPolygon(QtCanvasPolygonalItem):
     ###
     def __init__(self, canvas):
         super(QtCanvasPolygon, self).__init__(canvas)
-        
+
         self.poly = QPolygonEx()
         self.current_canvas = None
         self.ext = None
@@ -3454,7 +3441,7 @@ class QtCanvasPolygon(QtCanvasPolygonalItem):
     ###
     def __del__(self):
         self.hide()
-        
+
     ###
     #    Returns 4 (RttiValues.Rtti_Polygon).
     #
@@ -3463,7 +3450,7 @@ class QtCanvasPolygon(QtCanvasPolygonalItem):
     def rtti(self):
         return self.RTTI
     RTTI = RttiValues.Rtti_Polygon
-    
+
     ###
     #    Draws the polygon using the painter \a p.
     #
@@ -3538,7 +3525,7 @@ class QtCanvasSpline(QtCanvasPolygon):
     ###
     def __init__(self, canvas):
         super(QtCanvasSpline, self).__init__(canvas)
-        
+
         self.cl = True
 
     ###
@@ -3546,7 +3533,7 @@ class QtCanvasSpline(QtCanvasPolygon):
     ###
     def __del__(self):
         pass
-        
+
     ###
     #    Returns 8 (RttiValues.Rtti_Spline).
     #
@@ -3555,7 +3542,7 @@ class QtCanvasSpline(QtCanvasPolygon):
     def rtti(self):
         return self.RTTI
     RTTI = RttiValues.Rtti_Spline
-    
+
     ###
     #    Set the spline control points to \a ctrl.
     #
@@ -3603,13 +3590,13 @@ class QtCanvasSpline(QtCanvasPolygon):
 
         path = QPainterPath()
         path.moveTo(self.bez[0])
-        
+
         for i in range(1, self.bez.count()-1, 3):
             if self.cl:
                 path.cubicTo(self.bez[i], self.bez[i+1], self.bez[(i+2)%self.bez.size()])
             else:
                 path.cubicTo(self.bez[i], self.bez[i+1], self.bez[i+2])
-                
+
         p = path.toFillPolygon().toPolygon()
         super(QtCanvasSpline, self).setPoints(p)
 
@@ -3668,10 +3655,10 @@ class QtCanvasLine(QtCanvasPolygonalItem):
 
     def startPoint(self):
         return QPoint(self.x1, self.y1)
-        
+
     def endPoint(self):
         return QPoint(self.x2, self.y2)
-        
+
     ###
     #    Destroys the line.
     ###
@@ -3686,7 +3673,7 @@ class QtCanvasLine(QtCanvasPolygonalItem):
     def rtti(self):
         return self.RTTI
     RTTI = RttiValues.Rtti_Line
-    
+
     ###
     #  \reimp
     ###
@@ -3755,7 +3742,7 @@ class QtCanvasLine(QtCanvasPolygonalItem):
                 _dxy = dx*2/dy <= 2
             else:
                 _dxy = dy*2/dx <= 2
-            
+
             if _dxy:
                 # steep
                 if (px == py):
@@ -3837,10 +3824,10 @@ class QtCanvasRectangle(QtCanvasPolygonalItem):
             self.w = arg3
             self.h = arg4
             self.move(arg1, arg2)
-        
+
     def size(self):
         return QSize(self.w, self.h)
-        
+
     def rect(self):
         return QRect(int(self.x()), int(self.y()), self.w, self.h)
     ###
@@ -3855,7 +3842,7 @@ class QtCanvasRectangle(QtCanvasPolygonalItem):
     def chunks(self):
         # No need to do a polygon scan!
         return super(QtCanvasPolygonalItem, self).chunks()
-        
+
     ###
     #    Returns 5 (RttiValues.Rtti_Rectangle).
     #
@@ -3872,7 +3859,7 @@ class QtCanvasRectangle(QtCanvasPolygonalItem):
         if len(args) == 0:
             return s.collidesWith(0, self, self, 0, 0)
         return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, self, self, 0, 0)
-        
+
     ###
     #    Returns the width of the rectangle.
     ###
@@ -3931,7 +3918,6 @@ class QtCanvasRectangle(QtCanvasPolygonalItem):
     ###
     def drawShape(self, p):
         p.drawRect(self.x(), self.y(), self.w, self.h)
-
 
 ###
 #    \class QtCanvasEllipse qtcanvas.h
@@ -4012,7 +3998,7 @@ class QtCanvasEllipse(QtCanvasPolygonalItem):
     ###
     def __del__(self):
         self.hide()
-        
+
     ###
     #    Returns 6 (RttiValues.Rtti_Ellipse).
     #
@@ -4028,7 +4014,7 @@ class QtCanvasEllipse(QtCanvasPolygonalItem):
     def collidesWith(self, s, *args):
         if len(args) == 0:
             return s.collidesWith(0,self, 0, self, 0)
-        return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, self, 0, self, 0)       
+        return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, self, 0, self, 0)
     ###
     #    Returns the width of the ellipse.
     ###
@@ -4106,7 +4092,7 @@ class QtCanvasEllipse(QtCanvasPolygonalItem):
             p.drawEllipse(int(self.x()-self.w/2.0+0.5), int(self.y()-self.h/2.0+0.5), self.w, self.h)
         else:
             p.drawPie(int(self.x()-self.w/2.0+0.5), int(self.y()-self.h/2.0+0.5), self.w, self.h, self.a1, self.a2)
-            
+
 ###
 #    \class QtCanvasText
 #    \brief The QtCanvasText class provides a text object on a QtCanvas.
@@ -4181,7 +4167,7 @@ class QtCanvasText(QtCanvasItem):
     def collidesWith(self, s, *args):
         if len(args) == 0:
             return s.collidesWith(0, 0, 0, 0, self)
-        return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, 0, 0, 0, self)  
+        return collision_double_dispatch(s, args[0], args[1], args[2], args[3], 0, 0, 0, 0, self)
     ###
     #    Returns the bounding rectangle of the text.
     ###
@@ -4198,7 +4184,6 @@ class QtCanvasText(QtCanvasItem):
     #
     #    \sa setTextFlags() Qt.AlignmentFlag Qt.TextFlag
     ###
-
 
     ###
     #    Sets the alignment flags to \a f. These are a bitwise OR of the
@@ -4221,7 +4206,6 @@ class QtCanvasText(QtCanvasItem):
     ###
     def text(self):
         return self.txt
-
 
     ###
     #    Sets the text item's text to \a t. The text may contain newlines.
@@ -4271,7 +4255,6 @@ class QtCanvasText(QtCanvasItem):
     def setColor(self, c):
         self.col = c
         self.changeChunks()
-
 
     ###
     #  \reimp
@@ -4324,7 +4307,6 @@ class QtCanvasText(QtCanvasItem):
             for j in range(int(self.brect.top()/self.chunksize), int(self.brect.bottom()/self.chunksize+1)):
                 for i in range(int(self.brect.left()/self.chunksize), int(self.brect.right()/self.chunksize+1)):
                     self.canvas().removeItemFromChunk(self, i, j)
-
 
 class QtCanvasSprite(QtCanvasItem):
     ###
@@ -4399,9 +4381,10 @@ class QtCanvasSprite(QtCanvasItem):
     ###
     def __del__(self):
         self.removeFromChunks()
+        
     def frame(self):
         return self.frm
-        
+
     def frameCount(self):
         return self.images.count()
     ###
@@ -4472,7 +4455,6 @@ class QtCanvasSprite(QtCanvasItem):
                 nf = (nf + self.anim_val + self.frameCount()) % self.frameCount()
             self.move(self.x()+self.xVelocity(), self.y()+self.yVelocity(), nf)
 
-
     ###
     #    \fn int QtCanvasSprite.frame()
     #
@@ -4535,7 +4517,7 @@ class QtPolygonScanner():
             edge = Edge.Left.value+Edge.Top.value
         else:
             edge = Edge.Left.value+Edge.Right.value+Edge.Top.value+Edge.Bottom.value
-        
+
         self.__scan(pa, winding, index, npoints, edge)
 
     ###
@@ -4581,12 +4563,12 @@ class QtPolygonScanner():
             edge_l = 1
         else:
             edge_l = 0
-            
+
         if edges & Edge.Right.value:
             edge_r = 1
         else:
             edge_r = 0
-            
+
         if edges & Edge.Bottom.value:
             edge_b = 1
         else:
@@ -4711,7 +4693,6 @@ class QtPolygonScanner():
         ###
 
         self.processSpans(nPts, FirstPoint, FirstWidth)
-        del pETEs
         miFreeStorage(SLLBlock.next)
 ###**** END OF X11-based CODE ****###
 
@@ -4803,7 +4784,6 @@ class QtPolygonScanner():
 #
 ###
 
-
 ###
 # *     scanfill.h
 # *
@@ -4883,13 +4863,11 @@ class EdgeTableEntry():
         self.nextWETE = None   ### for winding num rule ###
         self.ClockWise = 0        ### flag for winding number rule       ###
 
-
 class ScanLineList():
     def __init__(self):
         self.scanline = 0              ### the scanline represented ###
         self.edgelist = None  ### header node              ###
         self.next = None  ### next in the list       ###
-
 
 class EdgeTable():
     def __init__(self):
@@ -4942,7 +4920,7 @@ def EVALUATEEDGEWINDING(pAET, pPrevAET, y, fixWAET=1):
         pPrevAET = pAET
         pAET = pAET.next
     return (pAET, pPrevAET)
-        
+
 ###
 # *     Evaluate the given edge at the given scanline.
 # *     If the edge has expired, then we leave it and fix up
@@ -5137,7 +5115,7 @@ def BRESINITPGONSTRUCT(dy, x1, x2, bres):
             bres.incr2 = 2 * dx - 2 * dy * bres.m
             bres.d = -2 * bres.m * dy + 2 * dx
     return bres
-            
+
 def miCreateETandAET(count, pts, ET, AET, pETEs, pSLLBlock):
     iSLLBlock = 0
 
@@ -5200,7 +5178,7 @@ def miCreateETandAET(count, pts, ET, AET, pETEs, pSLLBlock):
             if iSLLBlock==-1:
                 miFreeStorage(pSLLBlock.next)
                 return False
-            
+
             ET.ymax = max(ET.ymax, PrevPt.y())
             ET.ymin = min(ET.ymin, PrevPt.y())
             j += 1

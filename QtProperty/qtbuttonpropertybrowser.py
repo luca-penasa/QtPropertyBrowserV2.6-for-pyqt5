@@ -41,15 +41,16 @@
 from qtpropertybrowser import QtAbstractPropertyBrowser, QtBrowserItem
 from PyQt5.QtCore import QTimer, Qt, QSize, QRect, pyqtSignal
 from PyQt5.QtWidgets import (
-    QGridLayout, 
-    QToolButton, 
-    QLabel, 
-    QSizePolicy, 
-    QSpacerItem, 
+    QGridLayout,
+    QToolButton,
+    QLabel,
+    QSizePolicy,
+    QSpacerItem,
     QFrame
 
     )
-from qtpropertybrowserutils import QList, QMap
+from pyqtcore import QList, QMap
+
 ###
 #    \class QtButtonPropertyBrowser
 #
@@ -103,9 +104,9 @@ class WidgetItem():
         self.button = 0
         self.container = 0
         self.layout = 0
-        self.parent = 0
+        self.parent = None
         self.children = QList()
-        self.expanded = False 
+        self.expanded = False
         self.widget = 0# can be null
 
 class QtButtonPropertyBrowserPrivate():
@@ -113,7 +114,7 @@ class QtButtonPropertyBrowserPrivate():
         self.q_ptr = None
         self.WidgetItem = WidgetItem()
         self.m_indexToItem = QMap()
-        self.m_itemToIndex = QMap() 
+        self.m_itemToIndex = QMap()
         self.m_widgetToItem = QMap()
         self.m_buttonToItem = QMap()
         self.m_mainLayout = None
@@ -480,7 +481,7 @@ class QtButtonPropertyBrowser(QtAbstractPropertyBrowser):
 
         self.d_ptr = QtButtonPropertyBrowserPrivate()
         self.d_ptr.q_ptr = self
-        
+
         self.d_ptr.init(self)
 
     ###

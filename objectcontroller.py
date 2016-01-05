@@ -39,7 +39,8 @@
 ##
 ############################################################################/
 import sys
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from PyQt5.QtCore import QVariant, QTimeLine
 from PyQt5.QtGui import QTextDocument
 from PyQt5.QtWidgets import (
@@ -56,7 +57,7 @@ from PyQt5.QtWidgets import (
     QAction, 
     QApplication
 )
-from qtpropertybrowserutils import QMap, QList, QMapMap
+from pyqtcore import QMap, QList, QMapMap
 from qtvariantproperty import QtVariantPropertyManager, QtVariantEditorFactory
 from qttreepropertybrowser import QtTreePropertyBrowser
 
@@ -84,7 +85,7 @@ class ObjectControllerPrivate():
                     return pos
                 valueMap[value] = pos
                 pos += 1
-            
+
         return -1
 
     def intToEnum(self, metaEnum, intValue):
@@ -95,8 +96,7 @@ class ObjectControllerPrivate():
             if (not valueMap.contains(value)):
                 valueMap[value] = True
                 values.append(value)
-            
-        
+
         if (intValue >= values.count()):
             return -1
         return values.at(intValue)
@@ -109,19 +109,19 @@ class ObjectControllerPrivate():
             if (not (value & (1 << i))):
                 if (subValue & 1):
                     return False
-            
+
             i += 1
             subValue = subValue >> 1
-        
+
         return True
 
     def isPowerOf2(self, value):
         while (value):
             if (value & 1):
                 return value == 1
-            
+
             value = value >> 1
-        
+
         return False
 
     def flagToInt(self, metaEnum, flagValue):
@@ -137,7 +137,7 @@ class ObjectControllerPrivate():
                     intValue |= (1 << pos)
                 valueMap[value] = pos
                 pos += 1
-            
+
         return intValue
 
     def intToFlag(self, metaEnum, intValue):
@@ -148,7 +148,7 @@ class ObjectControllerPrivate():
             if (not valueMap.contains(value) and self.isPowerOf2(value)):
                 valueMap[value] = True
                 values.append(value)
-            
+
         flagValue = 0
         temp = intValue
         i = 0
@@ -159,7 +159,7 @@ class ObjectControllerPrivate():
                 flagValue |= values.at(i)
             i += 1
             temp = temp >> 1
-        
+
         return flagValue
 
     def updateClassProperties(self, metaObject, recursive):
@@ -172,7 +172,7 @@ class ObjectControllerPrivate():
         classProperty = self.m_classToProperty.value(metaObject)
         if (not classProperty):
             return
-        
+
         for idx in range(metaObject.propertyOffset(), metaObject.propertyCount(), 1):
             metaProperty = metaObject.property(idx)
             if (metaProperty.isReadable()):
@@ -215,10 +215,10 @@ class ObjectControllerPrivate():
                             if (not valueMap.contains(value) and self.isPowerOf2(value)):
                                 valueMap[value] = True
                                 flagNames.append(metaEnum.key(i))
-                            
+
                         subProperty.setAttribute("flagNames", flagNames)
                         subProperty.setValue(self.flagToInt(metaEnum, metaProperty.read(self.m_object)))
-                        
+
                     else: 
                         subProperty = self.m_manager.addProperty(QtVariantPropertyManager.enumTypeId(), metaProperty.name())
                         metaEnum = metaProperty.enumerator()
@@ -229,10 +229,10 @@ class ObjectControllerPrivate():
                             if (not valueMap.contains(value)):
                                 valueMap[value] = True
                                 enumNames.append(metaEnum.key(i))
-                            
+
                         subProperty.setAttribute("enumNames", enumNames)
                         subProperty.setValue(self.enumToInt(metaEnum, metaProperty.read(self.m_object)))
-                    
+
                 elif (self.m_manager.isPropertyTypeSupported(type)):
                     if (not metaProperty.isWritable()):
                         subProperty = self.m_readOnlyManager.addProperty(type, metaProperty.name() + " (Non Writable)")
@@ -245,14 +245,13 @@ class ObjectControllerPrivate():
                     subProperty = self.m_readOnlyManager.addProperty(QVariant.String, metaProperty.name())
                     subProperty.setValue("< Unknown Type >")
                     subProperty.setEnabled(False)
-                
+
                 classProperty.addSubProperty(subProperty)
                 self.m_propertyToIndex[subProperty] = idx
                 self.m_classToIndexToProperty[metaObject][idx] = subProperty
-            
+
         else: 
             self.updateClassProperties(metaObject, False)
-        
 
         self.m_topLevelProperties.append(classProperty)
         self.m_browser.addProperty(classProperty)
@@ -278,7 +277,6 @@ class ObjectControllerPrivate():
                 metaProperty.write(self.m_object, self.intToEnum(metaProperty.enumerator(), value))
         else: 
             metaProperty.write(self.m_object, value)
-        
 
         self.updateClassProperties(metaObject, True)
 
@@ -291,16 +289,16 @@ class ObjectController(QWidget):
         self.d_ptr.q_ptr = self
         self.d_ptr.m_object = 0
 
-##
-#    scroll = QScrollArea(self)
-#    scroll.setWidgetResizable(True)
-#
-#    self.d_ptr.m_browser = QtGroupBoxPropertyBrowser(self)
-#    layout = QVBoxLayout(self)
-#    layout.setMargin(0)
-#    layout.addWidget(scroll)
-#    scroll.setWidget(self.d_ptr.m_browser)
-##
+        ##
+        #    scroll = QScrollArea(self)
+        #    scroll.setWidgetResizable(True)
+        #
+        #    self.d_ptr.m_browser = QtGroupBoxPropertyBrowser(self)
+        #    layout = QVBoxLayout(self)
+        #    layout.setMargin(0)
+        #    layout.addWidget(scroll)
+        #    scroll.setWidget(self.d_ptr.m_browser)
+        ##
         browser = QtTreePropertyBrowser(self)
         browser.setRootIsDecorated(False)
         self.d_ptr.m_browser = browser
@@ -326,9 +324,9 @@ class ObjectController(QWidget):
             self.d_ptr.saveExpandedState()
             for it in self.d_ptr.m_topLevelProperties:
                 self.d_ptr.m_browser.removeProperty(it)
-            
+
             self.d_ptr.m_topLevelProperties.clear()
-        
+
         self.d_ptr.m_object = object
 
         if (not self.d_ptr.m_object):
@@ -344,11 +342,11 @@ class ObjectController(QWidget):
 class MyController(QDialog):
     def __init__(self, parent=None):
         super(MyController, self).__init__(parent)
-        
+
         self.theClassNames = QList()
         self.theClassCombo = QComboBox(self)
         self.theControlledObject = None
-        
+
         button = QToolButton(self)
         self.theController = ObjectController(self)
         buttonBox = QDialogButtonBox(self)
@@ -413,7 +411,7 @@ class MyController(QDialog):
             r.setHeight(max(r.height(), 50))
             r.moveCenter(QApplication.desktop().geometry().center())
             newWidget.setGeometry(r)
-            newWidget.setWindowTitle(self.tr("Controlled Object: %s")%className)
+            newWidget.setWindowTitle(self.tr("Controlled Object: %s"%className))
             newWidget.show()
 
         if (self.theControlledObject):

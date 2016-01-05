@@ -40,12 +40,13 @@
 ############################################################################/
 import sys
 
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QApplication, QDoubleSpinBox
-from qtpropertybrowserutils import QMap, QMapList
+from pyqtcore import QMap, QMapList
 from qtpropertymanager import QtDoublePropertyManager
-from qteditorfactory import EditorFactoryPrivate, QtAbstractEditorFactory, QtDoubleSpinBoxFactory, registerEditorFactory
+from qteditorfactory import QtAbstractEditorFactory, QtDoubleSpinBoxFactory, registerEditorFactory
 from qtpropertybrowser import QtProperty
 from qttreepropertybrowser import QtTreePropertyBrowser
 
@@ -58,7 +59,7 @@ class DecoratedDoublePropertyManager(QtDoublePropertyManager):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        
+
         self.propertyToData = QMap()
 
     def __del__(self):
@@ -120,23 +121,22 @@ class DecoratedDoublePropertyManager(QtDoublePropertyManager):
         self.propertyToData.remove(property)
         super().uninitializeProperty(property)
 
-
 class DecoratedDoubleSpinBoxFactory(QtAbstractEditorFactory):
-    
+
     def __init__(self, parent=None):
         super(DecoratedDoubleSpinBoxFactory, self).__init__(parent)
-        
+
         self.propertyToData = QMap()
         # We delegate responsibilities for QtDoublePropertyManager, which is a base class
         #   of DecoratedDoublePropertyManager to appropriate 
         self.originalFactory = QtDoubleSpinBoxFactory(self)
         self.createdEditors = QMapList()
         self.editorToProperty = QMap()
-    
+
     # not need to delete editors because they will be deld by originalFactory in its destructor
     def __del__(self):
         pass
-    
+
     def connectPropertyManager(self, manager):
         self.originalFactory.addPropertyManager(manager)
         manager.prefixChangedSignal.connect(self.slotPrefixChanged)
@@ -198,9 +198,9 @@ class DecoratedDoubleSpinBoxFactory(QtAbstractEditorFactory):
             if (self.createdEditors[property].isEmpty()):
                 self.createdEditors.remove(property)
             return
-            
+
 registerEditorFactory(DecoratedDoubleSpinBoxFactory, QDoubleSpinBox)
-    
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 

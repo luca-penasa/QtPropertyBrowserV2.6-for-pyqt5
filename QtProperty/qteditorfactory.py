@@ -40,53 +40,52 @@
 #############################################################################
 
 from qtpropertybrowserutils import (
-    QList, 
-    QMap, 
-    QtBoolEdit, 
+    QtKeySequenceEdit, 
+    QtBoolEdit,
     QtPropertyBrowserUtils
     )
+from pyqtcore import QMapList, QList, QMap
 from qtpropertybrowser import QtAbstractEditorFactory
-from qtpropertybrowserutils import QMapList, QtKeySequenceEdit
 from qtpropertymanager import QtEnumPropertyManager, cursorDatabase
 from PyQt5.QtCore import Qt, QEvent, pyqtSignal
 from PyQt5.QtWidgets import (
-    QStyle, 
-    QWidget, 
+    QStyle,
+    QWidget,
     QSpinBox,
-    QAction, 
+    QAction,
     QScrollBar,
     QComboBox,
     QLineEdit,
     QDateTimeEdit,
     QHBoxLayout,
     QApplication,
-    QSizePolicy, 
+    QSizePolicy,
     QColorDialog,
     QFontDialog,
     QSpacerItem,
-    QStyleOption, 
-    QSlider, 
-    QDoubleSpinBox, 
+    QStyleOption,
+    QSlider,
+    QDoubleSpinBox,
     QDateEdit,
-    QTimeEdit, 
-    QToolButton, 
+    QTimeEdit,
+    QToolButton,
     QLabel
 
     )
 from PyQt5.QtGui import (
-    QPainter, 
-    QRegExpValidator, 
-    QKeySequence, 
-    QCursor, 
-    QBrush, 
-    QIcon, 
+    QPainter,
+    QRegExpValidator,
+    QKeySequence,
+    QCursor,
+    QBrush,
+    QIcon,
     QFont,
     QColor)
 
 # Set a hard coded left margin to account for the indentation
 # of the tree view icon when switching to an editor
 def setupTreeViewEditorMargin(lt):
-    DecorationMargin = 4 
+    DecorationMargin = 4
     if (QApplication.layoutDirection() == Qt.LeftToRight):
         lt.setContentsMargins(DecorationMargin, 0, 0, 0)
     else:
@@ -1225,7 +1224,7 @@ class QtKeySequenceEditorFactory(QtAbstractEditorFactory):
     def disconnectPropertyManager(self, manager):
         manager.valueChangedSignal.disconnect(self.d_ptr.slotPropertyChanged)
 
-class QtCharEdit(QWidget): 
+class QtCharEdit(QWidget):
     valueChangedSignal = pyqtSignal(str)
     def __init__(self, parent=None):
         super(QtCharEdit, self).__init__(parent)
@@ -1608,7 +1607,7 @@ class QtCursorEditorFactoryPrivate(EditorFactoryPrivate):
                     del enumProp
 
                 return
-                
+
 ###
 #   \class QtCursorEditorFactory
 
@@ -1626,7 +1625,7 @@ class QtCursorEditorFactory(QtAbstractEditorFactory):
 
         self.d_ptr = QtCursorEditorFactoryPrivate()
         self.d_ptr.q_ptr = self
-        
+
         self.d_ptr.m_enumEditorFactory = QtEnumEditorFactory(self)
         self.d_ptr.m_enumPropertyManager = QtEnumPropertyManager(self)
         self.d_ptr.m_enumPropertyManager.valueChangedSignal.connect(self.d_ptr.slotEnumChanged)

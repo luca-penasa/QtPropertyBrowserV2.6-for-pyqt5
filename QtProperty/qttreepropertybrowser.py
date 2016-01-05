@@ -40,24 +40,23 @@
 #############################################################################
 
 from qtpropertybrowser import QtAbstractPropertyBrowser, QtBrowserItem
-from enum import Enum
 from PyQt5.QtCore import Qt, QRect, QSize, QEvent, QCoreApplication, pyqtSignal, pyqtProperty
 from PyQt5.QtWidgets import (
-    QHBoxLayout, QItemDelegate, 
-    QHeaderView, QApplication, QStyle, 
-    QTreeWidget, 
-    QStyleOptionViewItem, 
-    QTreeWidgetItem, 
-    QStyleOption, 
+    QHBoxLayout, QItemDelegate,
+    QHeaderView, QApplication, QStyle,
+    QTreeWidget,
+    QStyleOptionViewItem,
+    QTreeWidgetItem,
+    QStyleOption,
     QAbstractItemView
     )
 from PyQt5.QtGui import (
-    QIcon, QPainter, 
-    QPalette, QPen, 
-    QFontMetrics, QColor, 
+    QIcon, QPainter,
+    QPalette, QPen,
+    QFontMetrics, QColor,
     QPixmap)
 
-from qtpropertybrowserutils import QList, QMap
+from pyqtcore import QList, QMap
 
 ## Draw an icon indicating opened/closing branches
 def drawIndicatorIcon(palette, style):
@@ -65,7 +64,7 @@ def drawIndicatorIcon(palette, style):
     pix.fill(Qt.transparent)
     branchOption = QStyleOption()
     #r = QRect(QPoint(0, 0), pix.size())
-    branchOption.rect = QRect(2, 2, 9, 9); ## ### hardcoded in qcommonstyle.cpp
+    branchOption.rect = QRect(2, 2, 9, 9) ## ### hardcoded in qcommonstyle.cpp
     branchOption.palette = palette
     branchOption.state = QStyle.State_Children
 
@@ -86,14 +85,14 @@ def drawIndicatorIcon(palette, style):
     rc.addPixmap(pix, QIcon.Normal, QIcon.On)
     rc.addPixmap(pix, QIcon.Selected, QIcon.On)
     return rc
-    
-class QtTreePropertyBrowserPrivate():   
-    def __init__(self):        
+
+class QtTreePropertyBrowserPrivate():
+    def __init__(self):
         self.q_ptr = None
         self.m_indexToItem = QMap()
         self.m_itemToIndex = QMap()
         self.m_indexToBackgroundColor = QMap()
-        
+
         self.m_treeWidget = None
         self.m_headerVisible = True
         self.m_resizeMode = QtTreePropertyBrowser.Stretch
@@ -101,7 +100,7 @@ class QtTreePropertyBrowserPrivate():
         self.m_markPropertiesWithoutValue = False
         self.m_browserChangedBlocked = False
         self.m_expandIcon = QIcon()
-        
+
     def init(self, parent):
         layout = QHBoxLayout(parent)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -129,10 +128,10 @@ class QtTreePropertyBrowserPrivate():
         self.m_treeWidget.collapsed.connect(self.slotCollapsed)
         self.m_treeWidget.expanded.connect(self.slotExpanded)
         self.m_treeWidget.currentItemChanged.connect(self.slotCurrentTreeItemChanged)
-    
+
     def createEditor(self, property, parent):
         return self.q_ptr.createEditor(property, parent)
-        
+
     def currentItem(self):
         treeItem = self.m_treeWidget.currentItem()
         if treeItem:
@@ -204,7 +203,7 @@ class QtTreePropertyBrowserPrivate():
             newItem = QTreeWidgetItem(parentItem, afterItem)
         else:
             newItem = QTreeWidgetItem(self.m_treeWidget, afterItem)
-        
+
         self.m_itemToIndex[newItem] = index
         self.m_indexToItem[index] = newItem
 
@@ -218,7 +217,7 @@ class QtTreePropertyBrowserPrivate():
 
         if (self.m_treeWidget.currentItem() == item):
             self.m_treeWidget.setCurrentItem(None)
-        
+
         parent = item.parent()
         if parent:
             parent.removeChild(item)
@@ -235,10 +234,10 @@ class QtTreePropertyBrowserPrivate():
 
     def treeWidget(self):
         return self.m_treeWidget
-    
+
     def markPropertiesWithoutValue(self):
         return self.m_markPropertiesWithoutValue
-    
+
     def updateItem(self, item):
         property = self.m_itemToIndex[item].property()
         expandIcon = QIcon()
@@ -254,7 +253,7 @@ class QtTreePropertyBrowserPrivate():
                 item.setText(1, property.displayText())
         elif self.markPropertiesWithoutValue() and not self.m_treeWidget.rootIsDecorated():
             expandIcon = self.m_expandIcon
-        
+
         item.setIcon(0, expandIcon)
         item.setFirstColumnSpanned(not property.hasValue())
         item.setToolTip(0, property.propertyName())
@@ -271,13 +270,13 @@ class QtTreePropertyBrowserPrivate():
                 isEnabled = False
         else:
             isEnabled = False
-        
+
         if wasEnabled != isEnabled:
             if (isEnabled):
                 self.enableItem(item)
             else:
                 self.disableItem(item)
-        
+
         self.m_treeWidget.viewport().update()
 
     def calculatedBackgroundColor(self, item):
@@ -287,7 +286,7 @@ class QtTreePropertyBrowserPrivate():
             if it:
                 return it
             i = i.parent()
-        
+
         return QColor()
 
     def slotCollapsed(self, index):
@@ -312,7 +311,7 @@ class QtTreePropertyBrowserPrivate():
         browserItem = 0
         if newItem:
             browserItem = self.m_itemToIndex.get(newItem)
-        
+
         self.m_browserChangedBlocked = True
         self.q_ptr.setCurrentItem(browserItem)
         self.m_browserChangedBlocked = False
@@ -325,18 +324,18 @@ class QtTreePropertyBrowserPrivate():
         if treeItem:
             self.m_treeWidget.setCurrentItem(treeItem, 1)
             self.m_treeWidget.editItem(treeItem, 1)
-            
+
 ## ------------ QtPropertyEditorView
 class QtPropertyEditorView(QTreeWidget):
     def __init__(self,parent):
         super(QtPropertyEditorView, self).__init__(parent)
-        
+
         self.m_editorPrivate = None
         self.header().sectionDoubleClicked.connect(self.resizeColumnToContents)
-        
+
     def setEditorPrivate(self, editorPrivate):
         self.m_editorPrivate = editorPrivate
-    
+
     def indexToItem(self, index):
         return self.itemFromIndex(index)
 
@@ -357,7 +356,7 @@ class QtPropertyEditorView(QTreeWidget):
             if (c.isValid()):
                 painter.fillRect(option.rect, c)
                 opt.palette.setColor(QPalette.AlternateBase, c.lighter(112))
-        
+
         super(QtPropertyEditorView, self).drawRow(painter, opt, index)
         color = QApplication.style().styleHint(QStyle.SH_Table_GridLineColor, opt)
         painter.save()
@@ -379,7 +378,7 @@ class QtPropertyEditorView(QTreeWidget):
                             self.setCurrentIndex(index)
                         self.edit(index)
                         return
-                    
+
         super(QtPropertyEditorView, self).keyPressEvent(event)
 
     def mousePressEvent(self, event):
@@ -399,26 +398,26 @@ class QtPropertyEditorView(QTreeWidget):
 class QtPropertyEditorDelegate(QItemDelegate):
     def __init__(self, parent=None):
         super(QtPropertyEditorDelegate, self).__init__(parent)
-    
+
         self.m_editorPrivate = 0
         self.m_editedItem = 0
         self.m_editedWidget = 0
         self.m_disablePainting = False
         self.m_propertyToEditor = QMap()
         self.m_editorToProperty = QMap()
-        
+
     def setEditorPrivate(self,editorPrivate):
         self.m_editorPrivate = editorPrivate
-    
+
     def setModelData(self,pt_widget,pt_QAbstractItemModel, modelIndex):
         pass
-        
+
     def setEditorData(self, pt_widget, modelIndex):
         pass
-        
+
     def editedItem(self):
         return self.m_editedItem
-        
+
     def indentation(self,index):
         if (not self.m_editorPrivate):
             return 0
@@ -444,7 +443,7 @@ class QtPropertyEditorDelegate(QItemDelegate):
             if (self.m_editedWidget.hash_value == hv):
                 self.m_editedWidget = 0
                 self.m_editedItem = 0
-    
+
     def destroyEditor(self, editor, index):
         if editor:
             hv = editor.property('hash_value')
@@ -457,10 +456,10 @@ class QtPropertyEditorDelegate(QItemDelegate):
                 self.m_editedWidget = 0
                 self.m_editedItem = 0
             #editor.deleteLater()
-            
+
     def closeEditor(self, property):
         pass
-    
+
     def createEditor(self, parent,pt_QStyleOptionViewItem, index):
         if index.column() == 1 and self.m_editorPrivate:
             property = self.m_editorPrivate.indexToProperty(index)
@@ -478,12 +477,11 @@ class QtPropertyEditorDelegate(QItemDelegate):
                     self.m_editorToProperty[editor] = property
                     self.m_editedItem = item
                     self.m_editedWidget = editor
-                    
+
                     return editor
         return
 
     def updateEditorGeometry(self, editor, option, index):
-        #Q_UNUSED(index)
         editor.setGeometry(option.rect.adjusted(0, 0, 0, -1))
 
     def paint(self, painter, option, index):
@@ -492,14 +490,14 @@ class QtPropertyEditorDelegate(QItemDelegate):
             property = self.m_editorPrivate.indexToProperty(index)
             if (property):
                 hasValue = property.hasValue()
-        
+
         opt = QStyleOptionViewItem(option)
         if ((self.m_editorPrivate and index.column() == 0) or not hasValue):
             property = self.m_editorPrivate.indexToProperty(index)
             if (property and property.isModified()):
                 opt.font.setBold(True)
                 opt.fontMetrics = QFontMetrics(opt.font)
-        
+
         c = QColor()
         if (not hasValue and self.m_editorPrivate.markPropertiesWithoutValue()):
             c = opt.palette.color(QPalette.Dark)
@@ -512,12 +510,12 @@ class QtPropertyEditorDelegate(QItemDelegate):
         if (c.isValid()):
             painter.fillRect(option.rect, c)
         opt.state &= ~QStyle.State_HasFocus
-        
+
         if (index.column() == 1):
             item = self.m_editorPrivate.indexToItem(index)
             if (self.m_editedItem and (self.m_editedItem == item)):
                 self.m_disablePainting = True
-        
+
         super(QtPropertyEditorDelegate, self).paint(painter, opt, index)
         if (option.type):
             self.m_disablePainting = False
@@ -532,7 +530,7 @@ class QtPropertyEditorDelegate(QItemDelegate):
             else:
                 right = option.rect.left()
             painter.drawLine(right, option.rect.y(), right, option.rect.bottom())
-        
+
         painter.restore()
 
     def drawDecoration(self, painter, option,rect, pixmap):
@@ -558,7 +556,7 @@ class QtPropertyEditorDelegate(QItemDelegate):
         if event.type() == QEvent.KeyPress:
             return super(QtPropertyEditorDelegate, self).eventFilter(object, event)
         return super(QtPropertyEditorDelegate, self).eventFilter(object, event)
-        
+
 #   \class QtTreePropertyBrowser
 
 #   \brief The QtTreePropertyBrowser class provides QTreeWidget based
@@ -604,24 +602,24 @@ class QtPropertyEditorDelegate(QItemDelegate):
 #   Creates a property browser with the given \a parent.
 ###
 class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
-    class ResizeMode(Enum):
+    class ResizeMode():
         Interactive,Stretch,Fixed,ResizeToContents = range(4)
     Interactive,Stretch,Fixed,ResizeToContents = range(4)
     collapsedSignal = pyqtSignal(QtBrowserItem)
     expandedSignal = pyqtSignal(QtBrowserItem)
-    
+
     def __init__(self,parent=None):
         super(QtTreePropertyBrowser, self).__init__(parent)
-        
+
         self.d_ptr = QtTreePropertyBrowserPrivate()
         self.d_ptr.q_ptr = self
-        
+
         self.d_ptr.init(self)
         self.currentItemChangedSignal.connect(self.d_ptr.slotCurrentBrowserItemChanged)
 
     def editedItem(self):
         return self.d_ptr.m_delegate.editedItem()
-        
+
     ###
     #     Sets the current item to \a item and opens the relevant editor for it.
     ###
@@ -667,7 +665,7 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
             property = self.d_ptr.m_itemToIndex[it].property()
             if not property.hasValue():
                 self.d_ptr.updateItem(it)
-    
+
     ###
     #     \property QtTreePropertyBrowser::alternatingRowColors
     #     \brief whether to draw the background using alternating colors.
@@ -737,16 +735,15 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
         else:
             m = QHeaderView.Stretch
 
-        self.d_ptr.m_treeWidget.header().setResizeMode(m)
+        self.d_ptr.m_treeWidget.header().setSectionsMovable(m)
 
     ###
     #   \property QtTreePropertyBrowser::splitterPosition
     #   \brief the position of the splitter between the colunms.
     ###
-
     def splitterPosition(self):
         return self.d_ptr.m_treeWidget.header().sectionSize(0)
-    
+
     def setSplitterPosition(self, position):
         self.d_ptr.m_treeWidget.header().resizeSection(0, position)
 
@@ -843,7 +840,7 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
 
     #   \sa propertiesWithoutValueMarked()
     ###
-    
+
     def setPropertiesWithoutValueMarked(self, mark):
         if (self.d_ptr.m_markPropertiesWithoutValue == mark):
             return
@@ -853,7 +850,7 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
             property = self.d_ptr.m_itemToIndex[it].property()
             if not property.hasValue():
                 self.d_ptr.updateItem(it)
-        
+
         self.d_ptr.m_treeWidget.viewport().update()
 
     def propertiesWithoutValueMarked(self):

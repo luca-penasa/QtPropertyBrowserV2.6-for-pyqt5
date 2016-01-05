@@ -41,7 +41,9 @@
 
 import sys
 
-sys.path.append('./QtProperty/')
+sys.path.append('QtProperty')
+sys.path.append('libqt5')
+
 from PyQt5.QtWidgets import QApplication, QLineEdit
 from PyQt5.QtCore import (
     QTranslator, 
@@ -60,7 +62,7 @@ from PyQt5.QtCore import (
     )
 
 from PyQt5.QtGui import QKeySequence
-from qtpropertybrowserutils import QList
+from pyqtcore import QList
 from qtvariantproperty import QtVariantEditorFactory, QtVariantPropertyManager
 from qttreepropertybrowser import QtTreePropertyBrowser
 
@@ -239,7 +241,7 @@ if __name__ == '__main__':
     variantEditor.addProperty(topItem)
     variantEditor.setPropertiesWithoutValueMarked(True)
     variantEditor.setRootIsDecorated(False)
-    
+
     variantEditor.showMaximized()
     variantEditor.show()
     ret = app.exec_()
