@@ -155,7 +155,9 @@ class QtProperty():
             self.d__ptr.m_manager.d__ptr.propertyDestroyed(self)
 
         for property in self.d__ptr.m_subItems:
-            property.d__ptr.m_parentItems.remove(self)
+            parentItems = property.d__ptr.m_parentItems
+            if parentItems.__contains__(self):
+                parentItems.remove(self)
 
         for property in self.d__ptr.m_parentItems:
             property.d__ptr.m_subItems.removeAll(self)
