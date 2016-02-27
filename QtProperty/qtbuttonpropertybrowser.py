@@ -198,7 +198,7 @@ class QtButtonPropertyBrowserPrivate():
 
         self.m_recreateQueue.clear()
 
-    def _setExpanded(self, item, expanded):
+    def setExpanded(self, item, expanded):
         if (item.expanded == expanded):
             return
 
@@ -234,7 +234,7 @@ class QtButtonPropertyBrowserPrivate():
         if (not item):
             return
 
-        self._setExpanded(item, checked)
+        self.setExpanded(item, checked)
 
         if (checked):
             self.q_ptr.expandedSignal.emit(self.m_itemToIndex[item])

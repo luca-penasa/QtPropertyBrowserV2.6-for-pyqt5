@@ -5864,7 +5864,6 @@ class QtCursorPropertyManager(QtAbstractPropertyManager):
     #    \reimp
     ###
     def valueIcon(self, property):
-
         if not property in self.d_ptr.m_values.keys():
             return QIcon()
 

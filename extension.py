@@ -174,6 +174,7 @@ if __name__ == '__main__':
     variantFactory = QtVariantEditorFactory()
 
     ed1 = QtTreePropertyBrowser()
+    ed1.setResizeMode(QtTreePropertyBrowser.Interactive)
     varMan = variantManager
     ed1.setFactoryForManager(varMan, variantFactory)
     ed1.addProperty(item)

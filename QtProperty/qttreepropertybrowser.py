@@ -602,8 +602,6 @@ class QtPropertyEditorDelegate(QItemDelegate):
 #   Creates a property browser with the given \a parent.
 ###
 class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
-    class ResizeMode():
-        Interactive,Stretch,Fixed,ResizeToContents = range(4)
     Interactive,Stretch,Fixed,ResizeToContents = range(4)
     collapsedSignal = pyqtSignal(QtBrowserItem)
     expandedSignal = pyqtSignal(QtBrowserItem)
@@ -732,10 +730,8 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
             m = QHeaderView.Fixed
         elif mode==QtTreePropertyBrowser.ResizeToContents:
             m = QHeaderView.ResizeToContents
-        else:
-            m = QHeaderView.Stretch
 
-        self.d_ptr.m_treeWidget.header().setSectionsMovable(m)
+        self.d_ptr.m_treeWidget.header().setSectionResizeMode(m)
 
     ###
     #   \property QtTreePropertyBrowser::splitterPosition
@@ -881,6 +877,6 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
     rootIsDecorated = pyqtProperty(bool, rootIsDecorated, setRootIsDecorated)
     alternatingRowColors = pyqtProperty(bool, alternatingRowColors, setAlternatingRowColors)
     headerVisible = pyqtProperty(bool, isHeaderVisible, setHeaderVisible)
-    resizeMode = pyqtProperty(ResizeMode, resizeMode, setResizeMode)
+    resizeMode = pyqtProperty(int, resizeMode, setResizeMode)
     splitterPosition = pyqtProperty(int, splitterPosition, setSplitterPosition)
     propertiesWithoutValueMarked = pyqtProperty(bool, propertiesWithoutValueMarked, setPropertiesWithoutValueMarked)

@@ -82,15 +82,9 @@ from qtpropertymanager import (
     QtCursorPropertyManager,
     QtGroupPropertyManager
     )
-from pyqtcore import QMap, QMapMap
+from pyqtcore import QMap, QMapMap, qMetaTypeId
 from PyQt5.QtCore import QVariant, pyqtSignal, QUrl
 from PyQt5.QtGui import QIcon, QKeySequence
-
-#type id
-TYPE_ID_ENUM        = 1000
-TYPE_ID_FLAG        = 1001
-TYPE_ID_GROUP       = 1002
-TYPE_ID_ICON_MAP    = 1003
 
 class QtEnumPropertyType():
     def __init__(self):
@@ -104,6 +98,10 @@ class QtGroupPropertyType():
     def __init__(self):
         pass
 
+class QtIconMap():
+    def __init__(self):
+        pass
+        
 g_propertyToWrappedProperty = None
 def propertyToWrappedProperty():
     global g_propertyToWrappedProperty
@@ -885,7 +883,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #   \sa propertyType(), valueType()
     ###
     def enumTypeId():
-        return TYPE_ID_ENUM
+        return qMetaTypeId(QtEnumPropertyType)
 
     ###
     #   Returns the type id for a flag property.
@@ -897,7 +895,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #   \sa propertyType(), valueType()
     ###
     def flagTypeId():
-        return TYPE_ID_FLAG
+        return qMetaTypeId(QtFlagPropertyType)
 
     ###
     #   Returns the type id for a group property.
@@ -909,7 +907,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #   \sa propertyType(), valueType()
     ###
     def groupTypeId():
-        return TYPE_ID_GROUP
+        return qMetaTypeId(QtGroupPropertyType)
 
     ###
     #   Returns the type id for a icon map attribute.
@@ -920,7 +918,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #   \sa attributeType(), QtEnumPropertyManager.enumIcons()
     ###
     def iconMapTypeId():
-        return TYPE_ID_ICON_MAP
+        return qMetaTypeId(QtIconMap)
 
     ###
     #    Returns the given \a property converted into a QtVariantProperty.
@@ -1014,7 +1012,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #    Returns the value type associated with the given \a propertyType.
     ###
     def _valueType(self, propertyType):
-        return self.d_ptr.m_typeToValueType.get(propertyType)
+        return self.d_ptr.m_typeToValueType.get(propertyType, 0)
 
     ###
     #    Returns the given \a property's type.
@@ -1217,15 +1215,16 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
     #    \sa attributeValue(), QtVariantProperty.setAttribute(), attributeChanged()
     ###
     def setAttribute(self, property, attribute, value):
+        if type(value)!=QVariant:
+            value = QVariant(value)
         oldAttr = QVariant(self.attributeValue(property, attribute))
         if (not oldAttr.isValid()):
             return
-        v = QVariant(value)
-        attrType = v.userType()
+        attrType = value.userType()
         if (not attrType):
             return
 
-        if (attrType != self.attributeType(self.propertyType(property), attribute) and not v.canConvert(attrType)):
+        if (attrType != self.attributeType(self.propertyType(property), attribute) and not value.canConvert(attrType)):
             return
 
         internProp = propertyToWrappedProperty().get(property, 0)
@@ -1234,6 +1233,7 @@ class QtVariantPropertyManager(QtAbstractPropertyManager):
 
         manager = internProp.propertyManager()
         tm = type(manager)
+        value = value.value()
         if tm == QtIntPropertyManager:
             if (attribute == self.d_ptr.m_maximumAttribute):
                 manager.setMaximum(internProp, value)

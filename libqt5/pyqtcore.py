@@ -38,6 +38,14 @@ from PyQt5.QtCore import (
     QByteArray
 )
 
+g_metaTypeIds = {}
+def qMetaTypeId(classType):
+    typeId = g_metaTypeIds.get(classType)
+    if typeId is None:
+        typeId = len(g_metaTypeIds)+1200
+        g_metaTypeIds[classType] = typeId
+    return typeId
+    
 def dynamic_cast(object, _type):
     if type(object) == _type:
         return object
@@ -350,6 +358,12 @@ class QMapList(QMap):
         return v
 
     def get(self, key, defvalue=QList()):
+        v = super(QMapList, self).__getitem__(key)
+        if not v:
+            return defvalue
+        return v
+    
+    def value(self, key, defvalue=QList()):
         v = super(QMapList, self).__getitem__(key)
         if not v:
             return defvalue
