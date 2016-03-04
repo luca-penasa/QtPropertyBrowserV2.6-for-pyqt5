@@ -25,7 +25,29 @@ RAND_MAX = 0x7FFF
 
 import random
 import os
+def Int(s, defValue = 0):
+    try:
+        return int(s)
+    except:
+        return defValue
 
+def Int2(s, defValue = 0):
+    try:
+        return int(s), True
+    except:
+        return defValue, False
+        
+def Float(s, defValue = 0.0):
+    try:
+        return float(s)
+    except:
+        return defValue
+
+def Float2(s, defValue = 0.0):
+    try:
+        return float(s), True
+    except:
+        return defValue, False
 def rand():
     return int(random.random()*RAND_MAX)
 
@@ -45,6 +67,9 @@ def qMetaTypeId(classType):
         typeId = len(g_metaTypeIds)+1200
         g_metaTypeIds[classType] = typeId
     return typeId
+
+def qMettaTypeIds():
+    return g_metaTypeIds.values()
     
 def dynamic_cast(object, _type):
     if type(object) == _type:
@@ -457,6 +482,18 @@ class QString(str):
             return QString()
         return QString(nv)
 
+    def index(self, subStr, _fromIndex=0):
+        s = self.__str__()
+        ls = len(s)
+        if _fromIndex < 0:
+            _fromIndex = 0
+        if _fromIndex >= ls:
+            _fromIndex = ls - 1
+        s = s[_fromIndex:]
+        if self.__contains__(subStr):
+            return super().index(subStr)
+        return -1
+        
 class QChar(str):
     def __init__(self, s=''):
         super(QChar, self).__init__()

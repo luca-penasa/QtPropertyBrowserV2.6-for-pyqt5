@@ -453,3 +453,14 @@ class QtGroupBoxPropertyBrowser(QtAbstractPropertyBrowser):
     def itemChanged(self, item):
         self.d_ptr.propertyChanged(item)
 
+    ###
+    #   Return the position of scroll bar
+    ###
+    def scrollPosition(self):
+        return 0, 0
+    
+    ###
+    #   Set scroll bars position
+    ###
+    def setScrollPosition(self, dx, dy):
+        pass

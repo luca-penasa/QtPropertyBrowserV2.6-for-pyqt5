@@ -734,6 +734,19 @@ class QtTreePropertyBrowser(QtAbstractPropertyBrowser):
         self.d_ptr.m_treeWidget.header().setSectionResizeMode(m)
 
     ###
+    #   Return the position of scroll bar
+    ###
+    def scrollPosition(self):
+        return self.d_ptr.m_treeWidget.horizontalScrollBar().value(), self.d_ptr.m_treeWidget.verticalScrollBar().value()
+
+    ###
+    #   Set scroll bars position
+    ###
+    def setScrollPosition(self, dx, dy):
+        self.d_ptr.m_treeWidget.horizontalScrollBar().setValue(dx)
+        self.d_ptr.m_treeWidget.verticalScrollBar().setValue(dy)
+        
+    ###
     #   \property QtTreePropertyBrowser::splitterPosition
     #   \brief the position of the splitter between the colunms.
     ###
