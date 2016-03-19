@@ -449,6 +449,8 @@ class QVector(QList):
 class QString(str):
     def __init__(self, s=''):
         super(QString, self).__init__()
+        
+        self.length = self.__len__
         self.startsWith = self.startswith
         self.endsWith = self.endswith
 
