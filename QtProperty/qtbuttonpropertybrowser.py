@@ -242,7 +242,7 @@ class QtButtonPropertyBrowserPrivate():
             self.q_ptr.collapsedSignal.emit(self.m_itemToIndex[item])
 
     def updateLater(self):
-        QTimer.singleShot(0, self.q_ptr, self.slotUpdate())
+        QTimer.singleShot(0, self.slotUpdate)
 
     def propertyInserted(self, index, afterIndex):
         afterItem = self.m_indexToItem[afterIndex]
@@ -368,7 +368,7 @@ class QtButtonPropertyBrowserPrivate():
             self.removeRow(self.m_mainLayout, row)
             if (colSpan > 1):
                 self.removeRow(self.m_mainLayout, row)
-        elif (len(parentItem.children != 0)):
+        elif (len(parentItem.children) != 0):
             self.removeRow(parentItem.layout, row)
             if (colSpan > 1):
                 self.removeRow(parentItem.layout, row)
