@@ -166,7 +166,7 @@ class QtSpinBoxFactoryPrivate(EditorFactoryPrivate):
 
     def slotSingleStepChanged(self, property, step):
         editors = self.m_createdEditors.get(property)
-        if editors:
+        if editors is None:
             return
         for editor in editors:
             editor.blockSignals(True)
@@ -175,7 +175,7 @@ class QtSpinBoxFactoryPrivate(EditorFactoryPrivate):
 
     def slotReadOnlyChanged(self,  property, readOnly):
         editors = self.m_createdEditors.get(property)
-        if editors:
+        if editors is None:
             return
 
         manager = self.q_ptr.propertyManager(property)
