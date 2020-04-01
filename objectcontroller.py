@@ -57,14 +57,21 @@ from PyQt5.QtWidgets import (
     QAction, 
     QApplication
 )
-from pyqtcore import QMap, QList, QMapMap
-from qtvariantproperty import QtVariantPropertyManager, QtVariantEditorFactory
-from qttreepropertybrowser import QtTreePropertyBrowser
+
+from bistek.qtpropertybrowser.libqt5.pyqtcore import QMap, QList, QMapMap
+from bistek.qtpropertybrowser.QtProperty.qtvariantproperty import QtVariantPropertyManager, QtVariantEditorFactory
+from bistek.qtpropertybrowser.QtProperty.qttreepropertybrowser import QtTreePropertyBrowser
+
+# from pyqtcore import QMap, QList, QMapMap
+# from qtvariantproperty import
+# from qttreepropertybrowser import QtTreePropertyBrowser
 
 class ObjectControllerPrivate():
     def __init__(self):
         self.q_ptr = 0
-        self.m_object = 0
+        # self.m_object = 0
+        self.m_metaObjectsToComponents = QMap()
+        self.m_propertyToComponent = QMap()
         self.m_classToProperty = QMap()
         self.m_propertyToClass = QMap()
         self.m_propertyToIndex = QMap()
@@ -74,6 +81,17 @@ class ObjectControllerPrivate():
         self.m_browser = 0
         self.m_manager = 0
         self.m_readOnlyManager = 0
+
+    def clear(self):
+        self.m_metaObjectsToComponents.clear()
+        self.m_propertyToComponent.clear()
+        self.m_classToProperty.clear()
+        self.m_propertyToClass.clear()
+        self.m_propertyToIndex.clear()
+        self.m_classToIndexToProperty .clear()
+        self.m_propertyToExpanded.clear()
+        self.m_topLevelProperties.clear()
+
 
     def enumToInt(self, metaEnum, enumValue):
         valueMap = QMap() # dont show multiple enum values which have the same values
@@ -173,6 +191,8 @@ class ObjectControllerPrivate():
         if (not classProperty):
             return
 
+        obj = self.m_metaObjectsToComponents[metaObject]
+
         for idx in range(metaObject.propertyOffset(), metaObject.propertyCount(), 1):
             metaProperty = metaObject.property(idx)
             if (metaProperty.isReadable()):
@@ -180,11 +200,11 @@ class ObjectControllerPrivate():
                     subProperty = self.m_classToIndexToProperty[metaObject][idx]
                     if (metaProperty.isEnumType()):
                         if (metaProperty.isFlagType()):
-                            subProperty.setValue(self.flagToInt(metaProperty.enumerator(), metaProperty.read(self.m_object)))
+                            subProperty.setValue(self.flagToInt(metaProperty.enumerator(), metaProperty.read(obj)))
                         else:
-                            subProperty.setValue(self.enumToInt(metaProperty.enumerator(), metaProperty.read(self.m_object)))
+                            subProperty.setValue(self.enumToInt(metaProperty.enumerator(), metaProperty.read(obj)))
                     else: 
-                        subProperty.setValue(metaProperty.read(self.m_object))
+                        subProperty.setValue(metaProperty.read(obj))
 
     def addClassProperties(self, metaObject):
         if (not metaObject):
@@ -200,6 +220,8 @@ class ObjectControllerPrivate():
             for idx in range(metaObject.propertyOffset(), metaObject.propertyCount(), 1):
                 metaProperty = metaObject.property(idx)
                 type = metaProperty.userType()
+                # print(f"current type : {type}")
+                obj = self.m_metaObjectsToComponents[metaObject]
                 subProperty = 0
                 if (not metaProperty.isReadable()):
                     subProperty = self.m_readOnlyManager.addProperty(QVariant.String, metaProperty.name())
@@ -217,7 +239,7 @@ class ObjectControllerPrivate():
                                 flagNames.append(metaEnum.key(i))
 
                         subProperty.setAttribute("flagNames", flagNames)
-                        subProperty.setValue(self.flagToInt(metaEnum, metaProperty.read(self.m_object)))
+                        subProperty.setValue(self.flagToInt(metaEnum, metaProperty.read(obj)))
 
                     else: 
                         subProperty = self.m_manager.addProperty(QtVariantPropertyManager.enumTypeId(), metaProperty.name())
@@ -231,7 +253,7 @@ class ObjectControllerPrivate():
                                 enumNames.append(metaEnum.key(i))
 
                         subProperty.setAttribute("enumNames", enumNames)
-                        subProperty.setValue(self.enumToInt(metaEnum, metaProperty.read(self.m_object)))
+                        subProperty.setValue(self.enumToInt(metaEnum, metaProperty.read(obj)))
 
                 elif (self.m_manager.isPropertyTypeSupported(type)):
                     if (not metaProperty.isWritable()):
@@ -240,7 +262,9 @@ class ObjectControllerPrivate():
                         subProperty = self.m_readOnlyManager.addProperty(type, metaProperty.name() + " (Non Designable)")
                     else:
                         subProperty = self.m_manager.addProperty(type, metaProperty.name())
-                    subProperty.setValue(metaProperty.read(self.m_object))
+
+                    # print("here is offending line")
+                    subProperty.setValue(metaProperty.read(obj))
                 else: 
                     subProperty = self.m_readOnlyManager.addProperty(QVariant.String, metaProperty.name())
                     subProperty.setValue("< Unknown Type >")
@@ -248,6 +272,7 @@ class ObjectControllerPrivate():
 
                 classProperty.addSubProperty(subProperty)
                 self.m_propertyToIndex[subProperty] = idx
+                self.m_propertyToComponent[subProperty] = obj
                 self.m_classToIndexToProperty[metaObject][idx] = subProperty
 
         else: 
@@ -267,16 +292,22 @@ class ObjectControllerPrivate():
             return
 
         idx = self.m_propertyToIndex.value(property)
+        obj = self.m_propertyToComponent[property]
+        print(f"this should be the obj {obj}")
+        if obj is None:
+            print("object is None. should not happen")
+            return
 
-        metaObject = self.m_object.metaObject()
+        metaObject = obj.metaObject()
+
         metaProperty = metaObject.property(idx)
         if (metaProperty.isEnumType()):
             if (metaProperty.isFlagType()):
-                metaProperty.write(self.m_object, self.intToFlag(metaProperty.enumerator(), value))
+                metaProperty.write(obj, self.intToFlag(metaProperty.enumerator(), value))
             else:
-                metaProperty.write(self.m_object, self.intToEnum(metaProperty.enumerator(), value))
+                metaProperty.write(obj, self.intToEnum(metaProperty.enumerator(), value))
         else: 
-            metaProperty.write(self.m_object, value)
+            metaProperty.write(obj, value)
 
         self.updateClassProperties(metaObject, True)
 
@@ -287,7 +318,7 @@ class ObjectController(QWidget):
         super(ObjectController, self).__init__(parent)
         self.d_ptr = ObjectControllerPrivate()
         self.d_ptr.q_ptr = self
-        self.d_ptr.m_object = 0
+        # self.d_ptr.m_object = 0
 
         ##
         #    scroll = QScrollArea(self)
@@ -313,8 +344,25 @@ class ObjectController(QWidget):
 
         self.d_ptr.m_manager.valueChangedSignal.connect(self.d_ptr.slotValueChanged)
 
+    def clear(self):
+        self.d_ptr.clear()
+        self.d_ptr.q_ptr = self
+        self.d_ptr.m_readOnlyManager.clear()
+        self.d_ptr.m_manager.clear()
+
+
+
     def __del__(self):
         del self.d_ptr
+
+    def setComponents(self, components):
+        self.clear()
+        self.d_ptr.m_metaObjectsToComponents = QMap()
+        for component in components:
+            print(f"setting component {component.__class__.__name__}")
+            self.d_ptr.m_metaObjectsToComponents[component.metaObject()] = component
+            self.d_ptr.addClassProperties(component.metaObject())
+
 
     def setObject(self, object):
         if (self.d_ptr.m_object == object):
@@ -336,95 +384,3 @@ class ObjectController(QWidget):
 
         self.d_ptr.restoreExpandedState()
 
-    def object(self):
-        return self.d_ptr.m_object
-
-class MyController(QDialog):
-    def __init__(self, parent=None):
-        super(MyController, self).__init__(parent)
-
-        self.theClassNames = QList()
-        self.theClassCombo = QComboBox(self)
-        self.theControlledObject = None
-
-        button = QToolButton(self)
-        self.theController = ObjectController(self)
-        buttonBox = QDialogButtonBox(self)
-
-        button.clicked.connect(self.createAndControl)
-        buttonBox.rejected.connect(self.reject)
-
-        button.setText(self.tr("Create And Control"))
-        buttonBox.setStandardButtons(QDialogButtonBox.Close)
-
-        layout = QVBoxLayout(self)
-        internalLayout = QHBoxLayout()
-        internalLayout.addWidget(self.theClassCombo)
-        internalLayout.addWidget(button)
-        layout.addLayout(internalLayout)
-        layout.addWidget(self.theController)
-        layout.addWidget(buttonBox)
-
-        self.theClassNames.append("QWidget")
-        self.theClassNames.append("QPushButton")
-        self.theClassNames.append("QDialogButtonBox")
-        self.theClassNames.append("QTreeWidget")
-        self.theClassNames.append("QCalendarWidget")
-        self.theClassNames.append("QAction")
-        self.theClassNames.append("QTimeLine")
-        self.theClassNames.append("QTextDocument")
-
-        self.theClassCombo.addItems(self.theClassNames)
-
-    def __del__(self):
-        if (self.theControlledObject):
-            del self.theControlledObject
-
-    def createAndControl(self):
-        newObject = 0
-        className = self.theClassNames.at(self.theClassCombo.currentIndex())
-        if (className == "QWidget"):
-            newObject = QWidget()
-        elif (className == "QPushButton"):
-            newObject = QPushButton()
-        elif (className == "QDialogButtonBox"):
-            newObject = QDialogButtonBox()
-        elif (className == "QTreeWidget"):
-            newObject = QTreeWidget()
-        elif (className == "QCalendarWidget"):
-            newObject = QCalendarWidget()
-        elif (className == "QAction"):
-            newObject = QAction(None)
-        elif (className == "QTimeLine"):
-            newObject = QTimeLine()
-        elif (className == "QTextDocument"):
-            newObject = QTextDocument()
-
-        if (not newObject):
-            return
-
-        newWidget = newObject
-        if hasattr(newWidget, 'geometry'):
-            r = newWidget.geometry()
-            r.setSize(newWidget.sizeHint())
-            r.setWidth(max(r.width(), 150))
-            r.setHeight(max(r.height(), 50))
-            r.moveCenter(QApplication.desktop().geometry().center())
-            newWidget.setGeometry(r)
-            newWidget.setWindowTitle(self.tr("Controlled Object: %s"%className))
-            newWidget.show()
-
-        if (self.theControlledObject):
-            del self.theControlledObject
-
-        self.theControlledObject = newObject
-        self.theController.setObject(self.theControlledObject)
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    controller = MyController()
-    controller.show()
-
-    ret = app.exec()
-    sys.exit(ret)
