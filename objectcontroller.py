@@ -213,6 +213,9 @@ class ObjectControllerPrivate():
         classProperty = self.m_classToProperty.value(metaObject)
         if (not classProperty):
             className = metaObject.className()
+            if not className.endswith("Component"):
+                return
+
             classProperty = self.m_manager.addProperty(QtVariantPropertyManager.groupTypeId(), className)
             self.m_classToProperty[metaObject] = classProperty
             self.m_propertyToClass[classProperty] = metaObject
